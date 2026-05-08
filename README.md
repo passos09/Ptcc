@@ -1,7 +1,6 @@
 # Ptcc
 
 FORMULÁRIO DE PROPOSTA DE TCC
-Título do Projeto
 
 Sistema Inteligente de Monitoramento para Idosos com Integração a Smartwatch para Detecção de Quedas
 
