@@ -5,9 +5,11 @@ FORMULÁRIO DE PROPOSTA DE TCC
 Sistema Inteligente de Monitoramento para Idosos com Integração a Smartwatch para Detecção de Quedas
 
 Integrantes
-Nome 1
-Nome 2
-Nome 3
+Nome Wendell
+Nome Pedro moia
+Nome Matheus
+nome pedro henrique
+
 Tema
 
 Desenvolvimento de um sistema mobile integrado a smartwatch para monitoramento de idosos, permitindo detecção de quedas, acompanhamento de saúde e acionamento de emergência em tempo real.
