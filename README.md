@@ -6,8 +6,11 @@ Sistema Inteligente de Monitoramento para Idosos com Integração a Smartwatch p
 
 Integrantes
 Nome Wendell
+
 Nome Pedro moia
+
 Nome Matheus
+
 nome pedro henrique
 
 Tema
