@@ -5,6 +5,7 @@ FORMULÁRIO DE PROPOSTA DE TCC
 Sistema Inteligente de Monitoramento para Idosos com Integração a Smartwatch para Detecção de Quedas
 
 Integrantes
+
 Nome Wendell
 
 Nome Pedro moia
