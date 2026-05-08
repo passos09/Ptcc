@@ -32,16 +32,11 @@ Justificativa
 
 O crescimento da população idosa aumenta a necessidade de soluções tecnológicas voltadas à segurança e qualidade de vida. O sistema proposto busca auxiliar familiares e cuidadores através de monitoramento remoto e resposta rápida em situações de risco.
 
-Tecnologias Utilizadas
-Figma (Protótipo)
-React Native / Flutter
-Firebase
-Smartwatch Wear OS
-API de localização GPS
 Público-Alvo
 Idosos
 Familiares
 Cuidadores
+
 Funcionalidades Principais
 Detecção de quedas
 Alerta de emergência
