@@ -1,53 +1,131 @@
 # Ptcc
 
-FORMULÁRIO DE PROPOSTA DE TCC
+DOCUMENTACAO DO SISTEMA DE DETECCAO DE PENDENCIAS
 
-Sistema Inteligente de Monitoramento para Idosos com Integração a Smartwatch para Detecção de Quedas
+FISCAIS E DOCUMENTAIS
 
-Integrantes
+Documento simples e objetivo para apresentacao da proposta do sistema
+Este documento apresenta, de forma clara e organizada, os principais problemas, objetivos,
+solucoes e funcionamento de um sistema desenvolvido para monitorar pendencias fiscais e
+documentais de empresas contribuintes.
 
-Nome Wendell
+1. Introducao
+O sistema proposto tem como finalidade apoiar o controle fiscal e documental das empresas,
+permitindo identificar situacoes de regularidade e de pendencia de maneira rapida, visual e
+organizada.
+Como base de funcionamento, o contribuinte utilizara o sistema de apuracao de impostos realizado
+pela empresa de contabilidade. Apos a fase de contabilizacao fiscal, o contribuinte devera enviar as
+informacoes referentes ao pagamento dos impostos ate o 10o dia util de cada mes.
+Com essas informacoes, o sistema analisara o status dos tributos e da documentacao contratual da
+empresa, emitindo alertas preventivos sempre que identificar atraso, ausencia de pagamento ou
+necessidade de atualizacao contratual anual.
 
-Nome Pedro moia
+2. Problemas
+ Falta de acompanhamento centralizado das obrigacoes fiscais e documentais da empresa.
+ Risco de atraso no envio das informacoes de pagamento dos impostos apos a contabilizacao
+fiscal.
+ Dificuldade para identificar rapidamente se o cliente esta em dia ou em atraso com os tributos.
+ Ausencia de alertas preventivos para pagamentos nao efetuados.
+ Esquecimento da atualizacao contratual anual da empresa, o que pode gerar irregularidades
+documentais.
 
-Nome Matheus
+3. Objetivos
+ Automatizar o monitoramento das pendencias fiscais e documentais dos clientes.
+ Receber e organizar as informacoes de pagamento dos impostos dentro do prazo definido.
+ Exibir de forma simples e visual a situacao fiscal do contribuinte.
+ Notificar o cliente sempre que houver tributos pendentes ou atrasados.
+ Controlar o prazo de atualizacao contratual anual e gerar alertas quando necessario.
 
-nome pedro henrique
+4. Solucoes
+Para resolver os problemas identificados, o sistema sera integrado ao fluxo de apuracao fiscal
+realizado pela empresa de contabilidade. Assim, as informacoes apuradas servirao como base para o
+acompanhamento dos pagamentos realizados pelo contribuinte.
 
-Tema
+Documentacao gerada em 22/05/2026
 
-Desenvolvimento de um sistema mobile integrado a smartwatch para monitoramento de idosos, permitindo detecção de quedas, acompanhamento de saúde e acionamento de emergência em tempo real.
+ Registro mensal das informacoes de pagamento dos impostos enviadas pelo contribuinte.
+ Identificacao automatica do status de cada obrigacao fiscal.
+ Exibicao de status visual por cores para facilitar a interpretacao.
+ Envio de notificacoes ao cliente em caso de nao pagamento dos tributos.
+ Controle do prazo de 1 ano para verificacao de atualizacao contratual da empresa.
 
-Problema
+5. Funcionamento do Sistema
+O funcionamento do sistema seguira uma rotina padronizada, conforme descrito abaixo:
+Etapa Prazo Acao do Cliente Resposta do Sistema
+Apuracao fiscal Mensal Utilizar a base de apuracao de
+impostos produzida pela
+contabilidade.
 
-Muitos idosos vivem sozinhos ou passam longos períodos sem supervisão, o que pode dificultar o socorro rápido em casos de quedas ou emergências médicas.
+Receber os dados fiscais
+como referencia para
+acompanhamento.
 
-Objetivo Geral
+Envio das
+informacoes de
+pagamento
 
-Desenvolver um sistema inteligente de monitoramento para idosos utilizando aplicativo mobile e smartwatch para aumentar a segurança e agilizar atendimentos emergenciais.
+Ate o 10o dia
+util de cada mes
 
-Objetivos Específicos
-Detectar quedas automaticamente através do smartwatch;
-Enviar alertas para familiares ou responsáveis;
-Exibir localização em tempo real;
-Monitorar informações básicas de saúde;
-Disponibilizar botão de emergência no aplicativo.
-Justificativa
+Informar se os impostos
+foram pagos e enviar os
+dados correspondentes.
 
-O crescimento da população idosa aumenta a necessidade de soluções tecnológicas voltadas à segurança e qualidade de vida. O sistema proposto busca auxiliar familiares e cuidadores através de monitoramento remoto e resposta rápida em situações de risco.
+Atualizar o status dos tributos
+de acordo com as
+informacoes recebidas.
 
-Público-Alvo
-Idosos
-Familiares
-Cuidadores
+Tributo pago Apos analise Comprovar o pagamento
 
-Funcionalidades Principais
-Detecção de quedas
-Alerta de emergência
-Monitoramento cardíaco
-Localização em tempo real
-Histórico de atividades
-Comunicação rápida com familiares
-Resultados Esperados
+realizado.
 
-Espera-se aumentar a segurança dos idosos e facilitar o acompanhamento remoto por familiares e cuidadores através de um sistema acessível e inteligente.
+Exibir status em verde
+indicando que o cliente esta
+em dia.
+
+Tributo nao pago Apos analise Sem registro de pagamento
+
+do tributo.
+
+Exibir alerta em vermelho e
+notificar o cliente sobre a
+pendencia.
+
+Atualizacao
+contratual
+
+A cada 1 ano Manter a documentacao
+contratual atualizada.
+
+Emitir alerta quando a
+empresa ultrapassar 1 ano
+sem atualizacao contratual.
+
+O sistema utilizara uma sinalizacao visual simples para facilitar a leitura pelo usuario:
+Status verde: indica que o cliente esta em dia com os pagamentos dos impostos.
+Status vermelho: indica existencia de pendencia fiscal ou documental e necessidade de acao
+imediata.
+
+6. Conclusao
+O sistema de deteccao de pendencias fiscais e documentais oferece uma solucao pratica para
+acompanhar obrigacoes importantes da empresa. Por meio do controle mensal dos pagamentos de
+impostos e da verificacao anual da atualizacao contratual, a ferramenta contribui para reduzir riscos,
+melhorar a organizacao e aumentar a seguranca no cumprimento das exigencias fiscais e
+documentais.
+De forma simples, objetiva e visual, o sistema ajudara tanto a empresa de contabilidade quanto o
+contribuinte a manterem um acompanhamento mais eficiente da regularidade empresarial.
+
+Documentacao gerada em 22/05/2026
+
+ Tema: Desenvolvimento de um sistema web para monitoramento de pendências fiscais e
+documentais de empresas.
+ Problema: Como desenvolver um sistema que permita acompanhar de forma centralizada a
+situação fiscal e documental de empresas, reduzindo atrasos, esquecimentos e falhas no
+controle das obrigações?
+ Objetivo geral: Desenvolver um sistema web para monitorar pendências fiscais e
+documentais de empresas, permitindo o registro de informações, a visualização do status das
+obrigações e o envio de alertas preventivos.
+ Objetivos específicos: cadastrar empresas e tributos; registrar pagamentos; classificar status;
+emitir alertas; controlar atualização contratual; gerar visão visual e relatórios.
+ Metodologia: levantamento de requisitos com escritório contábil, modelagem do sistema,
+desenvolvimento do protótipo, testes com cenários
