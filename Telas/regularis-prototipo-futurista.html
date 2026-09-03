@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Regularis — Central de Monitoramento</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-1:#070F0D;
+    --bg-2:#0C1A17;
+    --panel:rgba(255,255,255,0.035);
+    --panel-hi:rgba(255,255,255,0.06);
+    --border:rgba(148,214,197,0.16);
+    --border-soft:rgba(255,255,255,0.08);
+    --ink:#EAF5F0;
+    --ink-muted:#8FA8A0;
+    --ink-faint:#587169;
+    --accent:#4CE9C6;
+    --accent-dark:#1E7A65;
+    --accent-soft:rgba(76,233,198,0.14);
+    --alert:#FF6E5C;
+    --alert-soft:rgba(255,110,92,0.14);
+    --warn:#FFC35E;
+    --warn-soft:rgba(255,195,94,0.14);
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    min-height:100vh;
+    font-family:'Space Grotesk',sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(1000px 600px at 12% -10%, rgba(76,233,198,0.16), transparent 60%),
+      radial-gradient(900px 700px at 100% 10%, rgba(255,110,92,0.10), transparent 55%),
+      linear-gradient(180deg, var(--bg-1), var(--bg-2));
+    background-attachment:fixed;
+  }
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size:42px 42px;
+    pointer-events:none;
+    mask-image:radial-gradient(circle at 30% 0%, black, transparent 75%);
+    z-index:0;
+  }
+  .mono{ font-family:'JetBrains Mono',monospace; }
+
+  .intro{
+    max-width:1220px;
+    margin:0 auto;
+    padding:34px 24px 0;
+    text-align:center;
+    position:relative;
+    z-index:1;
+  }
+  .intro .kicker{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.12em;
+    color:var(--accent);
+    margin-bottom:10px;
+  }
+  .intro h1{
+    font-weight:700;
+    font-size:27px;
+    margin:0 0 8px;
+    letter-spacing:-0.01em;
+  }
+  .intro p{
+    color:var(--ink-muted);
+    font-size:13.5px;
+    margin:0 0 26px;
+  }
+
+  .app{
+    position:relative; z-index:1;
+    max-width:1220px;
+    margin:0 auto 70px;
+    display:flex;
+    border:1px solid var(--border-soft);
+    border-radius:18px;
+    overflow:hidden;
+    background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+    backdrop-filter:blur(14px);
+    box-shadow:0 40px 90px -40px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.02) inset;
+    min-height:740px;
+  }
+
+  /* Sidebar */
+  .sidebar{
+    width:236px;
+    flex:none;
+    background:rgba(4,10,9,0.55);
+    border-right:1px solid var(--border-soft);
+    display:flex;
+    flex-direction:column;
+    padding:22px 14px;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:11px;
+    padding:0 8px 20px;
+    margin-bottom:16px;
+    border-bottom:1px solid var(--border-soft);
+  }
+  .brand .mark{
+    width:32px; height:32px;
+    border-radius:9px;
+    background:radial-gradient(circle at 30% 30%, var(--accent), var(--accent-dark));
+    display:flex; align-items:center; justify-content:center;
+    font-weight:700; font-size:15px; color:#04120E;
+    box-shadow:0 0 18px rgba(76,233,198,0.55);
+  }
+  .brand .name{ font-weight:700; font-size:15.5px; letter-spacing:0.01em; }
+  .brand .sub{ font-family:'JetBrains Mono',monospace; font-size:9.5px; color:var(--ink-faint); letter-spacing:0.08em; }
+
+  .navgroup{ margin-bottom:8px; }
+  .navlabel{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10px;
+    letter-spacing:0.1em;
+    color:var(--ink-faint);
+    padding:12px 10px 6px;
+  }
+  .navlink{
+    position:relative;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:9px 10px 9px 14px;
+    border-radius:9px;
+    font-size:13px;
+    font-weight:500;
+    color:var(--ink-muted);
+    cursor:pointer;
+    margin-bottom:2px;
+    border-left:2px solid transparent;
+    transition:all .15s ease;
+  }
+  .navlink:hover{ background:rgba(255,255,255,0.04); color:var(--ink); }
+  .navlink.active{
+    background:var(--accent-soft);
+    color:var(--accent);
+    border-left:2px solid var(--accent);
+  }
+  .navlink .ico{
+    width:6px; height:6px; border-radius:50%;
+    background:currentColor;
+    flex:none;
+    opacity:.7;
+  }
+  .sidebar-foot{
+    margin-top:auto;
+    padding:14px 10px 0;
+    border-top:1px solid var(--border-soft);
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .avatar{
+    width:30px; height:30px;
+    border-radius:50%;
+    background:linear-gradient(135deg, var(--accent-dark), #0a2b24);
+    border:1px solid var(--border);
+    flex:none;
+  }
+  .sidebar-foot .who{ font-size:12px; color:var(--ink); font-weight:600; }
+  .sidebar-foot .role{ font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--ink-faint); }
+
+  /* Main */
+  .main{ flex:1; display:flex; flex-direction:column; min-width:0; }
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:20px 32px;
+    border-bottom:1px solid var(--border-soft);
+  }
+  .topbar h2{ font-weight:700; font-size:20px; margin:0; letter-spacing:-0.01em; }
+  .topbar .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:0.06em;
+    color:var(--ink-faint);
+    margin-bottom:4px;
+  }
+  .body{ flex:1; padding:28px 32px 44px; overflow-y:auto; }
+
+  .view{ display:none; }
+  .view.active{ display:block; animation:fade .25s ease; }
+  @keyframes fade{ from{opacity:0; transform:translateY(5px);} to{opacity:1; transform:translateY(0);} }
+
+  /* Login */
+  .login-wrap{ max-width:380px; margin:52px auto; text-align:left; }
+  .login-logo{
+    width:48px; height:48px;
+    border-radius:12px;
+    background:radial-gradient(circle at 30% 30%, var(--accent), var(--accent-dark));
+    display:flex; align-items:center; justify-content:center;
+    color:#04120E; font-weight:700; font-size:18px;
+    box-shadow:0 0 26px rgba(76,233,198,0.5);
+    margin-bottom:20px;
+  }
+  .login-title{ font-size:23px; font-weight:700; margin:0 0 5px; }
+  .login-sub{ color:var(--ink-muted); font-size:13px; margin:0 0 26px; line-height:1.5; }
+
+  .field{ margin-bottom:16px; }
+  .field label{
+    display:block; font-family:'JetBrains Mono',monospace;
+    font-size:10.5px; letter-spacing:0.06em; font-weight:500;
+    color:var(--ink-faint); margin-bottom:7px;
+  }
+  .field input{
+    width:100%;
+    border:1px solid var(--border-soft);
+    background:rgba(255,255,255,0.03);
+    border-radius:9px;
+    padding:11px 13px;
+    font-size:13.5px;
+    font-family:'Space Grotesk',sans-serif;
+    color:var(--ink);
+  }
+  .field input:focus{ outline:1.5px solid var(--accent); outline-offset:1px; background:rgba(255,255,255,0.05); }
+  .field-row{ display:flex; gap:12px; }
+  .field-row .field{ flex:1; }
+
+  .btn{
+    border:1px solid transparent;
+    background:var(--accent);
+    color:#04140F;
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:700;
+    font-size:13.5px;
+    padding:11px 18px;
+    border-radius:9px;
+    cursor:pointer;
+    box-shadow:0 0 22px rgba(76,233,198,0.28);
+    transition:all .15s ease;
+  }
+  .btn:hover{ box-shadow:0 0 30px rgba(76,233,198,0.5); transform:translateY(-1px); }
+  .btn.block{ width:100%; }
+  .btn.ghost{
+    background:transparent;
+    color:var(--ink);
+    border:1px solid var(--border-soft);
+    box-shadow:none;
+  }
+  .btn.ghost:hover{ border-color:var(--accent); color:var(--accent); box-shadow:none; transform:none; }
+  .login-foot{ text-align:center; margin-top:18px; font-size:12px; color:var(--ink-faint); }
+
+  .role-select{ display:flex; flex-direction:column; gap:8px; }
+  .role-option{
+    display:flex; flex-wrap:wrap; align-items:baseline; gap:0 8px;
+    border:1px solid var(--border-soft);
+    border-radius:9px;
+    padding:11px 13px;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .role-option input{ margin:0 6px 0 0; accent-color:var(--accent); }
+  .role-option.selected{ border-color:var(--accent); background:var(--accent-soft); }
+  .role-option .ro-title{ font-size:13px; font-weight:600; }
+  .role-option .ro-desc{ flex-basis:100%; font-size:11px; color:var(--ink-muted); margin-left:22px; }
+
+  /* Dashboard hero */
+  .hero{
+    display:flex;
+    align-items:center;
+    gap:32px;
+    padding:26px 28px;
+    border:1px solid var(--border-soft);
+    border-radius:16px;
+    background:var(--panel);
+    margin-bottom:22px;
+  }
+  .gauge-wrap{ position:relative; width:130px; height:130px; flex:none; }
+  .gauge-wrap svg{ transform:rotate(-90deg); }
+  .gauge-label{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+  }
+  .gauge-label .pct{ font-family:'JetBrains Mono',monospace; font-size:26px; font-weight:700; color:var(--accent); }
+  .gauge-label .txt{ font-size:9.5px; color:var(--ink-faint); letter-spacing:0.05em; margin-top:2px; }
+  .hero-info h3{ margin:0 0 6px; font-size:16px; font-weight:700; }
+  .hero-info p{ margin:0; font-size:12.5px; color:var(--ink-muted); max-width:420px; line-height:1.5; }
+  .hero-tags{ display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
+  .tag{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10.5px;
+    padding:4px 9px;
+    border-radius:6px;
+    border:1px solid var(--border-soft);
+    color:var(--ink-muted);
+  }
+
+  .stat-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:22px; }
+  .stat-card{
+    background:var(--panel);
+    border:1px solid var(--border-soft);
+    border-radius:13px;
+    padding:16px;
+    position:relative;
+    overflow:hidden;
+  }
+  .stat-card::after{
+    content:""; position:absolute; top:-30px; right:-30px;
+    width:80px; height:80px; border-radius:50%;
+    background:radial-gradient(circle, var(--dot-color,var(--accent-soft)), transparent 70%);
+    opacity:.6;
+  }
+  .stat-card .num{ font-family:'JetBrains Mono',monospace; font-size:26px; font-weight:700; line-height:1; position:relative; }
+  .stat-card .lbl{ font-size:11.5px; color:var(--ink-muted); margin-top:8px; line-height:1.3; position:relative; }
+  .stat-card.ok .num{ color:var(--accent); }
+  .stat-card.ok{ --dot-color:var(--accent-soft); }
+  .stat-card.alert .num{ color:var(--alert); }
+  .stat-card.alert{ --dot-color:var(--alert-soft); }
+
+  .two-col{ display:grid; grid-template-columns:1.3fr 1fr; gap:20px; align-items:start; }
+
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--border-soft);
+    border-radius:13px;
+    padding:18px;
+  }
+  .panel-title{ font-size:13px; font-weight:700; margin-bottom:14px; letter-spacing:0.01em; }
+
+  .doc-status{
+    display:flex; align-items:center; justify-content:space-between;
+    background:var(--alert-soft);
+    border:1px solid rgba(255,110,92,0.28);
+    border-radius:13px;
+    padding:14px 16px;
+    margin-bottom:16px;
+  }
+  .doc-status .t{ font-size:13px; font-weight:700; color:var(--alert); }
+  .doc-status .s{ font-size:11.5px; color:var(--ink-muted); margin-top:2px; }
+  .dot-glow{ width:9px; height:9px; border-radius:50%; background:var(--alert); flex:none; box-shadow:0 0 10px var(--alert); animation:pulse 1.8s ease-in-out infinite; }
+  @keyframes pulse{ 0%,100%{ opacity:1; } 50%{ opacity:.4; } }
+
+  table{ width:100%; border-collapse:collapse; }
+  th{
+    text-align:left;
+    font-family:'JetBrains Mono',monospace;
+    font-size:10px;
+    letter-spacing:0.05em;
+    font-weight:500;
+    color:var(--ink-faint);
+    padding:0 10px 10px;
+    border-bottom:1px solid var(--border-soft);
+  }
+  td{
+    padding:12px 10px;
+    font-size:13px;
+    border-bottom:1px solid var(--border-soft);
+  }
+  tr:last-child td{ border-bottom:none; }
+  .cnpj{ font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--ink-muted); }
+
+  .badge{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10.5px; font-weight:600;
+    padding:4px 9px;
+    border-radius:20px;
+    white-space:nowrap;
+    display:inline-block;
+    border:1px solid transparent;
+  }
+  .badge.ok{ background:var(--accent-soft); color:var(--accent); border-color:rgba(76,233,198,0.3); }
+  .badge.alert{ background:var(--alert-soft); color:var(--alert); border-color:rgba(255,110,92,0.3); }
+  .badge.warn{ background:var(--warn-soft); color:var(--warn); border-color:rgba(255,195,94,0.3); }
+
+  .alert-item{ display:flex; gap:12px; padding:12px 0; border-bottom:1px solid var(--border-soft); }
+  .alert-item:last-child{ border-bottom:none; }
+  .alert-icon{
+    width:30px; height:30px; flex:none;
+    border-radius:8px;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--alert-soft); color:var(--alert);
+    border:1px solid rgba(255,110,92,0.3);
+    font-family:'JetBrains Mono',monospace; font-size:14px; font-weight:700;
+  }
+  .alert-icon.warn{ background:var(--warn-soft); color:var(--warn); border-color:rgba(255,195,94,0.3); }
+  .alert-body .t{ font-size:13px; font-weight:600; }
+  .alert-body .s{ font-size:11.5px; color:var(--ink-muted); margin-top:2px; line-height:1.4; }
+  .alert-body .time{ font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--ink-faint); margin-top:4px; }
+
+  .form-card{ max-width:560px; background:var(--panel); border:1px solid var(--border-soft); border-radius:14px; padding:26px; }
+  .hint{ font-size:11.5px; color:var(--ink-faint); margin:-6px 0 16px; line-height:1.5; }
+
+  .list-toolbar{ display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+  .list-toolbar .count{ font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--ink-muted); }
+
+  .esfera-title{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:0.08em;
+    font-weight:600;
+    color:var(--accent);
+  }
+</style>
+</head>
+<body>
+
+  <div class="intro">
+    <div class="kicker">REGULARIS · CENTRAL DE MONITORAMENTO FISCAL</div>
+    <h1>Protótipo Web — versão futurista</h1>
+    <p>Sistema de Monitoramento de Pendências Fiscais e Documentais</p>
+  </div>
+
+  <div class="app">
+    <div class="sidebar">
+      <div class="brand">
+        <div class="mark">R</div>
+        <div>
+          <div class="name">Regularis</div>
+          <div class="sub">v1.0 · fiscal ops</div>
+        </div>
+      </div>
+
+      <div class="navgroup">
+        <div class="navlabel">GERAL</div>
+        <div class="navlink active" data-view="dashboard" data-role="admin,gerente"><div class="ico"></div>Dashboard</div>
+        <div class="navlink" data-view="alertas" data-role="admin,gerente"><div class="ico"></div>Alertas</div>
+      </div>
+      <div class="navgroup">
+        <div class="navlabel">GESTÃO</div>
+        <div class="navlink" data-view="empresa" data-role="admin"><div class="ico"></div>Empresas</div>
+        <div class="navlink" data-view="tributos" data-role="admin,gerente"><div class="ico"></div>Tributos</div>
+        <div class="navlink" data-view="certidoes" data-role="admin,gerente"><div class="ico"></div>Certidões</div>
+      </div>
+      <div class="navgroup">
+        <div class="navlabel">ADMINISTRAÇÃO</div>
+        <div class="navlink" data-view="usuarios" data-role="admin"><div class="ico"></div>Usuários</div>
+      </div>
+      <div class="navgroup">
+        <div class="navlabel">CONTA</div>
+        <div class="navlink" data-view="login" data-role="admin,gerente"><div class="ico"></div>Sair (demo)</div>
+      </div>
+
+      <div class="sidebar-foot">
+        <div class="avatar"></div>
+        <div>
+          <div class="who" id="sf-who">Marina Souza</div>
+          <div class="role" id="sf-role">Administrador · acesso total</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="topbar" id="topbar">
+        <div>
+          <div class="eyebrow" id="tb-eyebrow">STATUS · CONTABILIDADE VALE SUL</div>
+          <h2 id="tb-title">Visão geral</h2>
+        </div>
+        <div style="display:flex; align-items:center; gap:14px;">
+          <span class="badge ok" id="role-badge">Administrador</span>
+          <button class="btn ghost" onclick="go('login')">Sair</button>
+        </div>
+      </div>
+
+      <div class="body">
+
+        <!-- DASHBOARD -->
+        <div class="view active" id="view-dashboard">
+
+          <div class="hero">
+            <div class="gauge-wrap">
+              <svg width="130" height="130" viewBox="0 0 130 130">
+                <circle cx="65" cy="65" r="56" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="10"/>
+                <circle cx="65" cy="65" r="56" fill="none" stroke="#4CE9C6" stroke-width="10"
+                  stroke-linecap="round" stroke-dasharray="352" stroke-dashoffset="63"
+                  style="filter:drop-shadow(0 0 8px rgba(76,233,198,0.7));"/>
+              </svg>
+              <div class="gauge-label">
+                <div class="pct">82%</div>
+                <div class="txt">REGULARIDADE</div>
+              </div>
+            </div>
+            <div class="hero-info">
+              <h3>21 empresas sob monitoramento contínuo</h3>
+              <p>O sistema consulta automaticamente tributos e certidões federais, estaduais e municipais, atualizando o índice de regularidade em tempo real e disparando alertas preventivos.</p>
+              <div class="hero-tags">
+                <span class="tag">18 tributos em dia</span>
+                <span class="tag">3 pendentes</span>
+                <span class="tag">2 alertas ativos</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-grid">
+            <div class="stat-card ok"><div class="num">18</div><div class="lbl">Tributos pagos em dia</div></div>
+            <div class="stat-card alert"><div class="num">03</div><div class="lbl">Tributos pendentes</div></div>
+            <div class="stat-card alert"><div class="num">02</div><div class="lbl">Alertas ativos</div></div>
+            <div class="stat-card ok"><div class="num">21</div><div class="lbl">Empresas monitoradas</div></div>
+          </div>
+
+          <div class="two-col">
+            <div class="panel">
+              <div class="panel-title">Empresas com pendência</div>
+              <table>
+                <thead><tr><th>Empresa</th><th>CNPJ</th><th>Situação</th></tr></thead>
+                <tbody>
+                  <tr><td>Vale Sul Comércio Ltda</td><td class="cnpj">12.345.678/0001-90</td><td><span class="badge alert">Pendente</span></td></tr>
+                  <tr><td>Nordeste Materiais ME</td><td class="cnpj">98.765.432/0001-11</td><td><span class="badge warn">Vence em 3 dias</span></td></tr>
+                  <tr><td>Central Distribuidora S.A.</td><td class="cnpj">45.222.111/0001-30</td><td><span class="badge ok">Em dia</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div>
+              <div class="doc-status">
+                <div>
+                  <div class="t">Situação documental: atenção</div>
+                  <div class="s">1 empresa com contrato vencido há mais de 30 dias</div>
+                </div>
+                <div class="dot-glow"></div>
+              </div>
+              <div class="panel">
+                <div class="panel-title">Últimos alertas</div>
+                <div class="alert-item">
+                  <div class="alert-icon">!</div>
+                  <div class="alert-body">
+                    <div class="t">ICMS não pago</div>
+                    <div class="s">Vale Sul Comércio Ltda</div>
+                    <div class="time">HÁ 2H</div>
+                  </div>
+                </div>
+                <div class="alert-item">
+                  <div class="alert-icon warn">i</div>
+                  <div class="alert-body">
+                    <div class="t">Certidão a vencer</div>
+                    <div class="s">Prefeitura de Guarulhos</div>
+                    <div class="time">ONTEM</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- EMPRESA -->
+        <div class="view" id="view-empresa">
+          <div class="form-card">
+            <div class="panel-title" style="font-size:15px; margin-bottom:18px;">Cadastrar empresa</div>
+            <div class="field"><label>RAZÃO SOCIAL</label><input placeholder="Ex: Vale Sul Comércio Ltda"></div>
+            <div class="field-row">
+              <div class="field"><label>CNPJ</label><input placeholder="00.000.000/0000-00"></div>
+              <div class="field"><label>TELEFONE</label><input placeholder="(00) 00000-0000"></div>
+            </div>
+            <div class="field"><label>ENDEREÇO</label><input placeholder="Rua, número, bairro, cidade"></div>
+            <div class="field"><label>E-MAIL</label><input placeholder="financeiro@empresa.com.br"></div>
+            <p class="hint">Os dados de CNPJ e esfera de atuação definem quais certidões o sistema passará a monitorar automaticamente.</p>
+            <button class="btn" onclick="go('dashboard')">Salvar empresa</button>
+          </div>
+        </div>
+
+        <!-- TRIBUTOS -->
+        <div class="view" id="view-tributos">
+          <div class="list-toolbar">
+            <span class="count">VALE SUL COMÉRCIO LTDA · 5 TRIBUTOS CADASTRADOS</span>
+            <button class="btn">+ Novo tributo</button>
+          </div>
+          <div class="panel" style="padding:6px 18px;">
+            <table>
+              <thead><tr><th>Tributo</th><th>Vencimento</th><th>Valor</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td>ICMS</td><td class="cnpj">10/09</td><td class="cnpj">R$ 4.230,00</td><td><span class="badge alert">Não pago</span></td></tr>
+                <tr><td>ISS</td><td class="cnpj">10/09</td><td class="cnpj">R$ 890,00</td><td><span class="badge warn">Vence em 3 dias</span></td></tr>
+                <tr><td>PIS/COFINS</td><td class="cnpj">25/08</td><td class="cnpj">R$ 2.140,00</td><td><span class="badge ok">Pago</span></td></tr>
+                <tr><td>IRPJ</td><td class="cnpj">25/08</td><td class="cnpj">R$ 3.310,00</td><td><span class="badge ok">Pago</span></td></tr>
+                <tr><td>CSLL</td><td class="cnpj">25/08</td><td class="cnpj">R$ 1.005,00</td><td><span class="badge ok">Pago</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- CERTIDÕES -->
+        <div class="view" id="view-certidoes">
+          <div class="list-toolbar">
+            <span class="count">VALE SUL COMÉRCIO LTDA · CERTIDÕES POR ESFERA</span>
+          </div>
+          <div class="panel" style="padding:6px 18px;">
+            <table>
+              <tbody>
+                <tr><td colspan="3" style="border:none; padding-top:12px;"><span class="esfera-title">FEDERAL</span></td></tr>
+                <tr><td>Receita Federal / PGFN</td><td class="cnpj">Válida até 14/12/2026</td><td><span class="badge ok">Regular</span></td></tr>
+
+                <tr><td colspan="3" style="border:none;"><span class="esfera-title" style="display:inline-block; padding-top:16px;">ESTADUAL</span></td></tr>
+                <tr><td>Sefaz-SP · Inscrição estadual</td><td class="cnpj">Vencida em 28/08/2026</td><td><span class="badge alert">Vencida</span></td></tr>
+
+                <tr><td colspan="3" style="border:none;"><span class="esfera-title" style="display:inline-block; padding-top:16px;">MUNICIPAL</span></td></tr>
+                <tr><td>Prefeitura de Guarulhos</td><td class="cnpj">Válida até 05/09/2026</td><td><span class="badge warn">Vence em 3 dias</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ALERTAS -->
+        <div class="view" id="view-alertas">
+          <div class="panel" style="max-width:640px;">
+            <div class="alert-item">
+              <div class="alert-icon">!</div>
+              <div class="alert-body">
+                <div class="t">Imposto não pago — ICMS</div>
+                <div class="s">Vale Sul Comércio Ltda está com o ICMS de setembro em aberto.</div>
+                <div class="time">HÁ 2H</div>
+              </div>
+            </div>
+            <div class="alert-item">
+              <div class="alert-icon">!</div>
+              <div class="alert-body">
+                <div class="t">Certidão estadual vencida</div>
+                <div class="s">A certidão da Sefaz-SP venceu em 28/08 e precisa de renovação.</div>
+                <div class="time">HÁ 5H</div>
+              </div>
+            </div>
+            <div class="alert-item">
+              <div class="alert-icon warn">i</div>
+              <div class="alert-body">
+                <div class="t">Atualização contratual pendente</div>
+                <div class="s">O contrato de Nordeste Materiais ME completa 1 ano em 6 dias.</div>
+                <div class="time">ONTEM</div>
+              </div>
+            </div>
+            <div class="alert-item">
+              <div class="alert-icon warn">i</div>
+              <div class="alert-body">
+                <div class="t">Certidão municipal a vencer</div>
+                <div class="s">A certidão da Prefeitura de Guarulhos vence em 3 dias.</div>
+                <div class="time">ONTEM</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- USUÁRIOS (admin) -->
+        <div class="view" id="view-usuarios">
+          <div class="list-toolbar">
+            <span class="count">4 USUÁRIOS COM ACESSO AO SISTEMA</span>
+            <button class="btn">+ Novo usuário</button>
+          </div>
+          <div class="panel" style="padding:6px 18px;">
+            <table>
+              <thead><tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Empresas visíveis</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td>Marina Souza</td><td class="cnpj">marina@contabilvalesul.com.br</td><td><span class="badge ok">Administrador</span></td><td class="cnpj">Todas</td><td><span class="badge ok">Ativo</span></td></tr>
+                <tr><td>Rodrigo Alves</td><td class="cnpj">rodrigo@contabilvalesul.com.br</td><td><span class="badge warn">Gerente</span></td><td class="cnpj">Vale Sul, Central Distribuidora</td><td><span class="badge ok">Ativo</span></td></tr>
+                <tr><td>Camila Nogueira</td><td class="cnpj">camila@contabilvalesul.com.br</td><td><span class="badge warn">Gerente</span></td><td class="cnpj">Nordeste Materiais</td><td><span class="badge ok">Ativo</span></td></tr>
+                <tr><td>Paulo Ramos</td><td class="cnpj">paulo@contabilvalesul.com.br</td><td><span class="badge warn">Gerente</span></td><td class="cnpj">—</td><td><span class="badge alert">Inativo</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="hint" style="margin-top:14px;">O administrador cadastra usuários, define o perfil de acesso (Administrador ou Gerente) e escolhe quais empresas cada gerente pode visualizar.</p>
+        </div>
+
+        <!-- LOGIN -->
+        <div class="view" id="view-login">
+          <div class="login-wrap">
+            <div class="login-logo">R</div>
+            <div class="login-title">Entrar</div>
+            <p class="login-sub">Acesse a central de monitoramento fiscal e documental da sua empresa.</p>
+            <div class="field"><label>E-MAIL</label><input type="email" placeholder="contato@empresa.com.br" value="contato@empresa.com.br"></div>
+            <div class="field"><label>SENHA</label><input type="password" placeholder="••••••••" value="••••••••"></div>
+            <div class="field">
+              <label>TIPO DE ACESSO</label>
+              <div class="role-select">
+                <label class="role-option selected" data-role-opt="admin">
+                  <input type="radio" name="role" value="admin" checked>
+                  <span class="ro-title">Administrador</span>
+                  <span class="ro-desc">Acesso total: empresas, tributos, certidões e usuários</span>
+                </label>
+                <label class="role-option" data-role-opt="gerente">
+                  <input type="radio" name="role" value="gerente">
+                  <span class="ro-title">Gerente</span>
+                  <span class="ro-desc">Acompanha tributos, certidões e alertas das empresas sob sua responsabilidade</span>
+                </label>
+              </div>
+            </div>
+            <button class="btn block" onclick="loginAs()">Entrar</button>
+            <p class="login-foot">Esqueci minha senha</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+<script>
+  const titles = {
+    login:    ["CONTA", "Entrar"],
+    dashboard:["STATUS · CONTABILIDADE VALE SUL", "Visão geral"],
+    empresa:  ["EMPRESAS", "Cadastrar empresa"],
+    tributos: ["VALE SUL COMÉRCIO LTDA", "Controle de tributos"],
+    certidoes:["VALE SUL COMÉRCIO LTDA", "Certidões negativas"],
+    alertas:  ["NOTIFICAÇÕES", "Alertas"],
+    usuarios: ["ADMINISTRAÇÃO", "Usuários e permissões"]
+  };
+  const roleLabels = {
+    admin:   { badge: "Administrador", who: "Marina Souza",  role: "Administrador · acesso total" },
+    gerente: { badge: "Gerente",        who: "Rodrigo Alves", role: "Gerente · Vale Sul, Central Distrib." }
+  };
+  let currentRole = 'admin';
+
+  document.querySelectorAll('.role-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      document.querySelectorAll('.role-option').forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      opt.querySelector('input').checked = true;
+    });
+  });
+
+  function loginAs(){
+    currentRole = document.querySelector('.role-option input:checked').value;
+    applyRole();
+    go('dashboard');
+  }
+
+  function applyRole(){
+    const info = roleLabels[currentRole];
+    document.getElementById('role-badge').textContent = info.badge;
+    document.getElementById('role-badge').className = 'badge ' + (currentRole === 'admin' ? 'ok' : 'warn');
+    document.getElementById('sf-who').textContent = info.who;
+    document.getElementById('sf-role').textContent = info.role;
+    document.querySelectorAll('.navlink[data-role]').forEach(n => {
+      const roles = n.dataset.role.split(',');
+      n.style.display = roles.includes(currentRole) ? 'flex' : 'none';
+    });
+  }
+
+  function go(name){
+    const link = document.querySelector('.navlink[data-view="' + name + '"]');
+    if (link && link.dataset.role && !link.dataset.role.split(',').includes(currentRole) && name !== 'login') {
+      name = 'dashboard';
+    }
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-' + name).classList.add('active');
+    document.querySelectorAll('.navlink').forEach(n => n.classList.toggle('active', n.dataset.view === name));
+    document.getElementById('tb-eyebrow').textContent = titles[name][0];
+    document.getElementById('tb-title').textContent = titles[name][1];
+    document.getElementById('topbar').style.display = name === 'login' ? 'none' : 'flex';
+    document.querySelector('.body').scrollTop = 0;
+  }
+  document.querySelectorAll('.navlink').forEach(n => n.addEventListener('click', () => go(n.dataset.view)));
+  applyRole();
+</script>
+</body>
+</html>
