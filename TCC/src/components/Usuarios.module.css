@@ -1,0 +1,109 @@
+.page {
+  padding: 28px 32px;
+  color: #EAF5F0;
+  font-family: 'Space Grotesk', sans-serif;
+  background: #0C1A17;
+  min-height: 100vh;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.count {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #8FA8A0;
+}
+
+.btn {
+  border: none;
+  background: #4CE9C6;
+  color: #04140F;
+  font-weight: 700;
+  font-size: 13.5px;
+  padding: 9px 16px;
+  border-radius: 9px;
+  cursor: pointer;
+}
+.btn:hover {
+  filter: brightness(1.08);
+}
+
+.panel {
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 13px;
+  padding: 6px 18px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  text-align: left;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  color: #587169;
+  padding: 12px 10px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.table td {
+  padding: 12px 10px;
+  font-size: 13px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.cellMono {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  color: #8FA8A0;
+}
+
+.badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 4px 9px;
+  border-radius: 20px;
+  display: inline-block;
+  border: 1px solid transparent;
+}
+
+.badgeOk {
+  background: rgba(76, 233, 198, 0.14);
+  color: #4CE9C6;
+  border-color: rgba(76, 233, 198, 0.3);
+}
+
+.badgeWarn {
+  background: rgba(255, 195, 94, 0.14);
+  color: #FFC35E;
+  border-color: rgba(255, 195, 94, 0.3);
+}
+
+.badgeAlert {
+  background: rgba(255, 110, 92, 0.14);
+  color: #FF6E5C;
+  border-color: rgba(255, 110, 92, 0.3);
+}
+
+.hint {
+  font-size: 11.5px;
+  color: #587169;
+  margin-top: 14px;
+  line-height: 1.5;
+}
