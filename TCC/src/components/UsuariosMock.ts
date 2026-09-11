@@ -1,6 +1,6 @@
 import { Usuario } from './Usuario.types';
 
-export const usuariosMock: Usuario[] = [
+export const UsuariosMock: Usuario[] = [
   {
     id: '1',
     nome: 'Marina Souza',
