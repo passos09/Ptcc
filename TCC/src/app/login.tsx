@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useRouter } from 'expo-router';
 import {
   Alert,
   SafeAreaView,
@@ -6,11 +7,14 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  Pressable,
   View,
   ScrollView,
 } from "react-native";
 
 export default function App() {
+  const router = useRouter();
+
   const [cnpj, setCnpj] = useState("");
   const [senha, setSenha] = useState("");
 
@@ -88,13 +92,17 @@ export default function App() {
               GERAL
             </Text>
 
-            <Text style={styles.itemMenu}>
-              • Dashboard
-            </Text>
+            <Pressable onPress={() => router.push("/dashboard")}>
+  <Text style={styles.itemMenu}>
+    • Dashboard
+  </Text>
+</Pressable>
 
-            <Text style={styles.itemMenu}>
-              • Alertas
-            </Text>
+<Pressable onPress={() => router.push("/alertas")}>
+  <Text style={styles.itemMenu}>
+    • Alertas
+  </Text>
+</Pressable>
 
 
             {/* GESTÃO */}
@@ -102,13 +110,17 @@ export default function App() {
               GESTÃO
             </Text>
 
-            <Text style={styles.itemMenu}>
-              • Empresas
-            </Text>
+            <Pressable onPress={() => router.push("/empresas")}>
+  <Text style={styles.itemMenu}>
+    • Empresas
+  </Text>
+</Pressable>
 
-            <Text style={styles.itemMenu}>
-              • Certidões
-            </Text>
+<Pressable onPress={() => router.push("/certidoes")}>
+  <Text style={styles.itemMenu}>
+    • Certidões
+  </Text>
+</Pressable>
 
 
             {/* ADMINISTRAÇÃO */}
@@ -116,9 +128,11 @@ export default function App() {
               ADMINISTRAÇÃO
             </Text>
 
-            <Text style={styles.itemMenu}>
-              • Usuários
-            </Text>
+            <Pressable onPress={() => router.push('/usuarios')}>
+  <Text style={styles.itemMenu}>
+    • Usuários
+  </Text>
+</Pressable>
 
 
             {/* CONTA */}
