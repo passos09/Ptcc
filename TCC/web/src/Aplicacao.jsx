@@ -1,3 +1,5 @@
+import { testarConexao, verificarSessao } from "./supabaseClient";
+import { useEffect } from "react";
 import { useState } from "react";
 import { usuariosIniciais } from "./dados";
 import PaginaInicial from "./componentes/inicio/PaginaInicial";
@@ -8,6 +10,10 @@ function Aplicacao() {
   const [tela, setTela] = useState("inicio");
   const [usuario, setUsuario] = useState(null);
   const [usuarios, setUsuarios] = useState(usuariosIniciais);
+useEffect(() => {
+  testarConexao();
+  verificarSessao();
+}, []);
 
   function entrar(usuarioLogado) {
     setUsuario(usuarioLogado);
