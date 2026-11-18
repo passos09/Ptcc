@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useRouter } from "expo-router";
 import {
@@ -15,6 +16,7 @@ export default function Dashboard() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
+        style={styles.scrollView}
         contentContainerStyle={styles.scroll}
         horizontal={false}
       >
@@ -38,30 +40,20 @@ export default function Dashboard() {
 
           {/* MENU LATERAL */}
           <View style={styles.menu}>
-
-            {/* LOGO */}
             <View style={styles.logoArea}>
               <View style={styles.logo}>
                 <Text style={styles.logoTexto}>R</Text>
               </View>
 
               <View>
-                <Text style={styles.nomeLogo}>
-                  Regularis
-                </Text>
-
-                <Text style={styles.versao}>
-                  v1.0 - fiscal ops
-                </Text>
+                <Text style={styles.nomeLogo}>Regularis</Text>
+                <Text style={styles.versao}>v1.0 - fiscal ops</Text>
               </View>
             </View>
 
             <View style={styles.linha} />
 
-            {/* GERAL */}
-            <Text style={styles.tituloMenu}>
-              GERAL
-            </Text>
+            <Text style={styles.tituloMenu}>GERAL</Text>
 
             <View style={styles.menuSelecionado}>
               <Text style={styles.menuSelecionadoTexto}>
@@ -69,74 +61,42 @@ export default function Dashboard() {
               </Text>
             </View>
 
-            <Text style={styles.itemMenu}>
-              • Alertas
-            </Text>
+            <Text style={styles.itemMenu}>• Alertas</Text>
 
-            {/* GESTÃO */}
-            <Text style={styles.tituloMenu}>
-              GESTÃO
-            </Text>
+            <Text style={styles.tituloMenu}>GESTÃO</Text>
 
-            <Text style={styles.itemMenu}>
-              • Empresas
-            </Text>
+            <Text style={styles.itemMenu}>• Empresas</Text>
+            <Text style={styles.itemMenu}>• Tributos</Text>
+            <Text style={styles.itemMenu}>• Certidões</Text>
 
-            <Text style={styles.itemMenu}>
-              • Tributos
-            </Text>
+            <Text style={styles.tituloMenu}>ADMINISTRAÇÃO</Text>
 
-            <Text style={styles.itemMenu}>
-              • Certidões
-            </Text>
-
-            {/* ADMINISTRAÇÃO */}
-            <Text style={styles.tituloMenu}>
-              ADMINISTRAÇÃO
-            </Text>
-
-            <Pressable
-              onPress={() => router.push("/usuarios")}
-            >
-              <Text style={styles.itemMenu}>
-                • Usuários
-              </Text>
+            <Pressable onPress={() => router.push("/usuarios")}>
+              <Text style={styles.itemMenu}>• Usuários</Text>
             </Pressable>
 
-            {/* CONTA */}
-            <Text style={styles.tituloMenu}>
-              CONTA
-            </Text>
+            <Text style={styles.tituloMenu}>CONTA</Text>
 
             <View style={styles.sair}>
-              <Text style={styles.sairTexto}>
-                • Sair (demo)
-              </Text>
+              <Text style={styles.sairTexto}>• Sair (demo)</Text>
             </View>
 
-            {/* USUÁRIO */}
             <View style={styles.usuario}>
               <View style={styles.avatar}>
                 <Text style={styles.avatarTexto}>M</Text>
               </View>
 
               <View>
-                <Text style={styles.nomeUsuario}>
-                  Marina Souza
-                </Text>
-
+                <Text style={styles.nomeUsuario}>Marina Souza</Text>
                 <Text style={styles.cargo}>
                   Administrador · acesso
                 </Text>
-
-                <Text style={styles.cargo}>
-                  total
-                </Text>
+                <Text style={styles.cargo}>total</Text>
               </View>
             </View>
           </View>
 
-          {/* ÁREA PRINCIPAL */}
+          {/* CONTEÚDO PRINCIPAL */}
           <View style={styles.conteudo}>
 
             {/* CABEÇALHO */}
@@ -159,30 +119,22 @@ export default function Dashboard() {
                 </View>
 
                 <Pressable style={styles.botaoSair}>
-                  <Text style={styles.botaoSairTexto}>
-                    Sair
-                  </Text>
+                  <Text style={styles.botaoSairTexto}>Sair</Text>
                 </Pressable>
               </View>
             </View>
 
             {/* CARD PRINCIPAL */}
             <View style={styles.cardPrincipal}>
-
-              {/* CÍRCULO */}
               <View style={styles.circuloArea}>
                 <View style={styles.circulo}>
-                  <Text style={styles.porcentagem}>
-                    82%
-                  </Text>
-
+                  <Text style={styles.porcentagem}>82%</Text>
                   <Text style={styles.regularidade}>
                     REGULARIDADE
                   </Text>
                 </View>
               </View>
 
-              {/* TEXTO */}
               <View style={styles.cardTexto}>
                 <Text style={styles.cardTitulo}>
                   21 empresas sob monitoramento contínuo
@@ -218,47 +170,33 @@ export default function Dashboard() {
 
             {/* INDICADORES */}
             <View style={styles.indicadores}>
-
               <View style={styles.indicador}>
-                <Text style={styles.numeroVerde}>
-                  18
-                </Text>
-
+                <Text style={styles.numeroVerde}>18</Text>
                 <Text style={styles.indicadorTexto}>
                   Tributos pagos em dia
                 </Text>
               </View>
 
               <View style={styles.indicador}>
-                <Text style={styles.numeroVermelho}>
-                  03
-                </Text>
-
+                <Text style={styles.numeroVermelho}>03</Text>
                 <Text style={styles.indicadorTexto}>
                   Tributos pendentes
                 </Text>
               </View>
 
               <View style={styles.indicador}>
-                <Text style={styles.numeroVermelho}>
-                  02
-                </Text>
-
+                <Text style={styles.numeroVermelho}>02</Text>
                 <Text style={styles.indicadorTexto}>
                   Alertas ativos
                 </Text>
               </View>
 
               <View style={styles.indicador}>
-                <Text style={styles.numeroVerde}>
-                  21
-                </Text>
-
+                <Text style={styles.numeroVerde}>21</Text>
                 <Text style={styles.indicadorTexto}>
                   Empresas monitoradas
                 </Text>
               </View>
-
             </View>
 
             {/* PARTE INFERIOR */}
@@ -266,27 +204,16 @@ export default function Dashboard() {
 
               {/* EMPRESAS */}
               <View style={styles.empresasCard}>
-
                 <Text style={styles.secaoTitulo}>
                   Empresas com pendência
                 </Text>
 
-                {/* CABEÇALHO TABELA */}
                 <View style={styles.tabelaCabecalho}>
-                  <Text style={styles.coluna}>
-                    Empresa
-                  </Text>
-
-                  <Text style={styles.coluna}>
-                    CNPJ
-                  </Text>
-
-                  <Text style={styles.coluna}>
-                    Situação
-                  </Text>
+                  <Text style={styles.coluna}>Empresa</Text>
+                  <Text style={styles.coluna}>CNPJ</Text>
+                  <Text style={styles.coluna}>Situação</Text>
                 </View>
 
-                {/* EMPRESA 1 */}
                 <View style={styles.linhaEmpresa}>
                   <Text style={styles.empresaNome}>
                     Vale Sul Comércio Ltda
@@ -303,7 +230,6 @@ export default function Dashboard() {
                   </View>
                 </View>
 
-                {/* EMPRESA 2 */}
                 <View style={styles.linhaEmpresa}>
                   <Text style={styles.empresaNome}>
                     Nordeste Materiais ME
@@ -320,7 +246,6 @@ export default function Dashboard() {
                   </View>
                 </View>
 
-                {/* EMPRESA 3 */}
                 <View style={styles.linhaEmpresa}>
                   <Text style={styles.empresaNome}>
                     Central Distribuidora S.A.
@@ -336,13 +261,10 @@ export default function Dashboard() {
                     </Text>
                   </View>
                 </View>
-
               </View>
 
               {/* LADO DIREITO */}
               <View style={styles.colunaDireita}>
-
-                {/* SITUAÇÃO */}
                 <View style={styles.situacaoCard}>
                   <Text style={styles.situacaoTitulo}>
                     Situação documental: atenção
@@ -355,22 +277,17 @@ export default function Dashboard() {
                   <View style={styles.pontoVermelho} />
                 </View>
 
-                {/* ALERTAS */}
                 <View style={styles.alertasCard}>
-
                   <Text style={styles.secaoTitulo}>
                     Últimos alertas
                   </Text>
 
-                  {/* ALERTA 1 */}
                   <View style={styles.alerta}>
                     <View style={styles.alertaIcone}>
-                      <Text style={styles.alertaIconeTexto}>
-                        !
-                      </Text>
+                      <Text style={styles.alertaIconeTexto}>!</Text>
                     </View>
 
-                    <View>
+                    <View style={styles.alertaConteudo}>
                       <Text style={styles.alertaTitulo}>
                         ICMS não pago
                       </Text>
@@ -379,21 +296,16 @@ export default function Dashboard() {
                         Vale Sul Comércio Ltda
                       </Text>
 
-                      <Text style={styles.alertaTempo}>
-                        HÁ 2H
-                      </Text>
+                      <Text style={styles.alertaTempo}>HÁ 2H</Text>
                     </View>
                   </View>
 
-                  {/* ALERTA 2 */}
                   <View style={styles.alerta}>
                     <View style={styles.alertaIconeAmarelo}>
-                      <Text style={styles.alertaIconeTexto}>
-                        i
-                      </Text>
+                      <Text style={styles.alertaIconeTexto}>i</Text>
                     </View>
 
-                    <View>
+                    <View style={styles.alertaConteudo}>
                       <Text style={styles.alertaTitulo}>
                         Certidão a vencer
                       </Text>
@@ -402,17 +314,12 @@ export default function Dashboard() {
                         Prefeitura de Guarulhos
                       </Text>
 
-                      <Text style={styles.alertaTempo}>
-                        ONTEM
-                      </Text>
+                      <Text style={styles.alertaTempo}>ONTEM</Text>
                     </View>
                   </View>
-
                 </View>
-
               </View>
             </View>
-
           </View>
         </View>
       </ScrollView>
@@ -424,19 +331,28 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
+    width: "100%",
     backgroundColor: "#061411",
+  },
+
+  scrollView: {
+    flex: 1,
+    width: "100%",
   },
 
   scroll: {
     flexGrow: 1,
-    paddingBottom: 30,
+    width: "100%",
+    alignSelf: "stretch",
+    paddingBottom: 20,
   },
 
   /* TÍTULO */
 
   titulo: {
+    width: "100%",
     alignItems: "center",
-    paddingTop: 25,
+    paddingTop: 15,
     paddingHorizontal: 20,
   },
 
@@ -467,10 +383,13 @@ const styles = StyleSheet.create({
 
   sistema: {
     flexDirection: "row",
+    flex: 1,
+    width: "100%",
     minHeight: 690,
-    marginTop: 25,
-    marginHorizontal: 20,
-    borderRadius: 15,
+    alignSelf: "stretch",
+    marginTop: 15,
+    marginHorizontal: 0,
+    borderRadius: 0,
     overflow: "hidden",
     borderWidth: 1,
     borderColor: "#263733",
@@ -481,6 +400,7 @@ const styles = StyleSheet.create({
 
   menu: {
     width: 210,
+    flexShrink: 0,
     backgroundColor: "#030d0b",
     borderRightWidth: 1,
     borderRightColor: "#1d302c",
@@ -616,6 +536,7 @@ const styles = StyleSheet.create({
 
   conteudo: {
     flex: 1,
+    minWidth: 0,
     paddingBottom: 25,
   },
 
@@ -681,6 +602,7 @@ const styles = StyleSheet.create({
   /* CARD PRINCIPAL */
 
   cardPrincipal: {
+    width: "auto",
     margin: 28,
     marginBottom: 18,
     padding: 25,
@@ -722,6 +644,7 @@ const styles = StyleSheet.create({
 
   cardTexto: {
     flex: 1,
+    minWidth: 0,
     paddingLeft: 20,
   },
 
@@ -736,7 +659,7 @@ const styles = StyleSheet.create({
     color: "#78918b",
     fontSize: 10,
     lineHeight: 16,
-    maxWidth: 620,
+    maxWidth: 900,
   },
 
   tags: {
@@ -763,18 +686,20 @@ const styles = StyleSheet.create({
 
   indicadores: {
     flexDirection: "row",
+    flexWrap: "wrap",
     gap: 12,
     paddingHorizontal: 28,
   },
 
   indicador: {
     flex: 1,
-    minHeight: 72,
+    minWidth: 130,
+    minHeight: 90,
     borderWidth: 1,
     borderColor: "#263733",
     borderRadius: 11,
     backgroundColor: "#111f1c",
-    padding: 13,
+    padding: 18,
     justifyContent: "center",
   },
 
@@ -800,6 +725,7 @@ const styles = StyleSheet.create({
 
   parteInferior: {
     flexDirection: "row",
+    flexWrap: "wrap",
     gap: 18,
     paddingHorizontal: 28,
     marginTop: 18,
@@ -807,6 +733,7 @@ const styles = StyleSheet.create({
 
   empresasCard: {
     flex: 1.4,
+    minWidth: 280,
     borderWidth: 1,
     borderColor: "#263733",
     borderRadius: 12,
@@ -901,6 +828,7 @@ const styles = StyleSheet.create({
 
   colunaDireita: {
     flex: 0.85,
+    minWidth: 250,
     gap: 15,
   },
 
@@ -952,6 +880,11 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: "#263733",
+  },
+
+  alertaConteudo: {
+    flex: 1,
+    minWidth: 0,
   },
 
   alertaIcone: {
