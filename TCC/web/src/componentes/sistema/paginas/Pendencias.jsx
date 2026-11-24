@@ -10,10 +10,26 @@ function Pendencias({ empresas, pendencias, onAdicionar }) {
     status: "Pendente"
   });
 
-  function salvar(evento) {
+  async function salvar(evento) {
     evento.preventDefault();
-    if (!formulario.empresaId || !formulario.descricao || !formulario.vencimento) return;
-    onAdicionar({ ...formulario, empresaId: Number(formulario.empresaId) });
+
+    if (
+      !formulario.empresaId ||
+      !formulario.descricao ||
+      !formulario.vencimento
+    ) {
+      return;
+    }
+
+    const sucesso = await onAdicionar({
+      ...formulario,
+      empresaId: Number(formulario.empresaId)
+    });
+
+    if (!sucesso) {
+      return;
+    }
+
     setFormulario({
       empresaId: empresas[0]?.id || "",
       descricao: "",
@@ -21,6 +37,7 @@ function Pendencias({ empresas, pendencias, onAdicionar }) {
       vencimento: "",
       status: "Pendente"
     });
+
     setAbrirFormulario(false);
   }
 

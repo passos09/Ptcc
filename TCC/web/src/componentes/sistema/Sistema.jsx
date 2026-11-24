@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import BarraLateral from "./BarraLateral";
 import BarraSuperior from "./BarraSuperior";
 import Painel from "./paginas/Painel";
@@ -8,12 +8,42 @@ import Pendencias from "./paginas/Pendencias";
 import Documentos from "./paginas/Documentos";
 import Usuarios from "./paginas/Usuarios";
 import Alertas from "./paginas/Alertas";
-import { empresasIniciais, pendenciasIniciais } from "../../dados";
+import {
+  carregarEmpresas,
+  carregarPendencias,
+  criarPendenciaManual
+} from "../../supabaseClient";
 
 function Sistema({ usuario, usuarios, setUsuarios, onSair }) {
   const [tela, setTela] = useState("dashboard");
-  const [empresas, setEmpresas] = useState(empresasIniciais);
-  const [pendencias, setPendencias] = useState(pendenciasIniciais);
+  const [empresas, setEmpresas] = useState([]);
+  const [pendencias, setPendencias] = useState([]);
+
+  useEffect(() => {
+    async function carregarDados() {
+      const [resultadoEmpresas, resultadoPendencias] = await Promise.all([
+        carregarEmpresas(),
+        carregarPendencias()
+      ]);
+
+      if (!resultadoEmpresas.erro) {
+        setEmpresas(resultadoEmpresas.dados);
+      }
+
+      if (!resultadoPendencias.erro) {
+        setPendencias(resultadoPendencias.dados);
+      }
+    }
+
+    carregarDados();
+  }, []);
+  async function atualizarPendencias() {
+    const resultado = await carregarPendencias();
+
+    if (!resultado.erro) {
+      setPendencias(resultado.dados);
+    }
+  }
 
   const administrador = usuario?.cargo === "Administrador";
 
@@ -31,8 +61,21 @@ function Sistema({ usuario, usuarios, setUsuarios, onSair }) {
     setEmpresas((atuais) => [...atuais, { ...novaEmpresa, id: Date.now() }]);
   }
 
-  function adicionarPendencia(novaPendencia) {
-    setPendencias((atuais) => [...atuais, { ...novaPendencia, id: Date.now() }]);
+  async function adicionarPendencia(novaPendencia) {
+    const resultado = await criarPendenciaManual(novaPendencia);
+
+    if (resultado.erro) {
+      console.error("Erro ao cadastrar pendência:", resultado.erro);
+      return false;
+    }
+
+    const resultadoPendencias = await carregarPendencias();
+
+    if (!resultadoPendencias.erro) {
+      setPendencias(resultadoPendencias.dados);
+    }
+
+    return true;
   }
 
   function adicionarUsuario(novoUsuario) {
@@ -41,31 +84,39 @@ function Sistema({ usuario, usuarios, setUsuarios, onSair }) {
 
   const paginas = administrador
     ? {
-        dashboard: <Painel empresas={empresas} pendencias={pendencias} />,
-        alertas: <Alertas pendencias={pendenciasVisiveis} />,
-        empresas: <Empresas empresas={empresas} onAdicionar={adicionarEmpresa} />,
-        pendencias: (
-          <Pendencias
-            empresas={empresas}
-            pendencias={pendencias}
-            onAdicionar={adicionarPendencia}
-          />
-        ),
-        documentos: <Documentos empresas={empresasVisiveis} />,
-        usuarios: <Usuarios usuarios={usuarios} onAdicionar={adicionarUsuario} />
-      }
+      dashboard: <Painel empresas={empresas} pendencias={pendencias} />,
+      alertas: <Alertas pendencias={pendenciasVisiveis} />,
+      empresas: <Empresas empresas={empresas} onAdicionar={adicionarEmpresa} />,
+      pendencias: (
+        <Pendencias
+          empresas={empresas}
+          pendencias={pendencias}
+          onAdicionar={adicionarPendencia}
+        />
+      ),
+      documentos: <Documentos
+        empresas={empresasVisiveis}
+        usuario={usuario}
+        onDocumentoEnviado={atualizarPendencias}
+      />,
+      usuarios: <Usuarios usuarios={usuarios} onAdicionar={adicionarUsuario} />
+    }
     : {
-        dashboard: <PainelGestor usuario={usuario} empresas={empresasVisiveis} pendencias={pendenciasVisiveis} />,
-        alertas: <Alertas pendencias={pendenciasVisiveis} />,
-        pendencias: (
-          <Pendencias
-            empresas={empresasVisiveis}
-            pendencias={pendenciasVisiveis}
-            onAdicionar={adicionarPendencia}
-          />
-        ),
-        documentos: <Documentos empresas={empresasVisiveis} />
-      };
+      dashboard: <PainelGestor usuario={usuario} empresas={empresasVisiveis} pendencias={pendenciasVisiveis} />,
+      alertas: <Alertas pendencias={pendenciasVisiveis} />,
+      pendencias: (
+        <Pendencias
+          empresas={empresasVisiveis}
+          pendencias={pendenciasVisiveis}
+          onAdicionar={adicionarPendencia}
+        />
+      ),
+      documentos: <Documentos
+        empresas={empresasVisiveis}
+        usuario={usuario}
+        onDocumentoEnviado={atualizarPendencias}
+      />
+    };
 
   return (
     <div className="system">
