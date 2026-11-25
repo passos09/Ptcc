@@ -682,3 +682,86 @@ export async function marcarNotificacaoComoLida(id) {
     erro: null
   };
 }
+export async function carregarHistorico() {
+  const [
+    { data: historicos, error: historicoError },
+    { data: pendencias, error: pendenciasError },
+    { data: usuarios, error: usuariosError }
+  ] = await Promise.all([
+    supabase
+      .from("historico_pendencia")
+      .select(
+        "id, pendencia_id, usuario_id, status_anterior, status_novo, observacao, criado_em, origem"
+      )
+      .order("criado_em", { ascending: false }),
+
+    supabase
+      .from("pendencia")
+      .select("id, titulo, empresa_id"),
+
+    supabase
+      .from("usuario")
+      .select("id, nome")
+  ]);
+
+  if (historicoError || pendenciasError || usuariosError) {
+    const erro =
+      historicoError?.message ||
+      pendenciasError?.message ||
+      usuariosError?.message;
+
+    console.error("Erro ao carregar histórico:", erro);
+
+    return {
+      dados: [],
+      erro
+    };
+  }
+
+  const mapaPendencias = new Map(
+    pendencias.map((pendencia) => [
+      pendencia.id,
+      pendencia
+    ])
+  );
+
+  const mapaUsuarios = new Map(
+    usuarios.map((usuario) => [
+      usuario.id,
+      usuario.nome
+    ])
+  );
+
+  const dados = historicos.map((historico) => {
+    const pendencia = mapaPendencias.get(
+      historico.pendencia_id
+    );
+
+    return {
+      id: historico.id,
+      pendenciaId: historico.pendencia_id,
+      pendencia:
+        pendencia?.titulo || "Pendência",
+      empresaId:
+        pendencia?.empresa_id || null,
+      usuario:
+        historico.origem === "sistema"
+          ? "Sistema"
+          : mapaUsuarios.get(historico.usuario_id) ||
+          "Usuário",
+      statusAnterior:
+        historico.status_anterior,
+      statusNovo:
+        historico.status_novo,
+      observacao:
+        historico.observacao || "",
+      origem: historico.origem,
+      criadoEm: historico.criado_em
+    };
+  });
+
+  return {
+    dados,
+    erro: null
+  };
+} 

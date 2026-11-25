@@ -1,7 +1,8 @@
 function BarraLateral({ tela, onMudarTela, onSair, administrador }) {
   const menuGeral = [
     ["dashboard", "Painel"],
-    ["alertas", "Alertas"]
+    ["alertas", "Alertas"],
+    ["historico", "Histórico"]
   ];
 
   const menuGestao = [
