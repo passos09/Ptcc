@@ -640,4 +640,45 @@ export async function criarUsuarioReal({
     usuario: data?.usuario || null,
     erro: null
   };
-} 
+}
+export async function carregarNotificacoes() {
+  const { data, error } = await supabase
+    .from("notificacao")
+    .select("id, usuario_id, pendencia_id, mensagem, lida, criada_em")
+    .order("criada_em", { ascending: false });
+
+  if (error) {
+    console.error("Erro ao carregar notificações:", error.message);
+
+    return {
+      dados: [],
+      erro: error.message
+    };
+  }
+
+  return {
+    dados: data,
+    erro: null
+  };
+}
+
+export async function marcarNotificacaoComoLida(id) {
+  const { error } = await supabase
+    .from("notificacao")
+    .update({ lida: true })
+    .eq("id", id);
+
+  if (error) {
+    console.error("Erro ao marcar notificação como lida:", error.message);
+
+    return {
+      sucesso: false,
+      erro: error.message
+    };
+  }
+
+  return {
+    sucesso: true,
+    erro: null
+  };
+}

@@ -8,25 +8,34 @@ import Pendencias from "./paginas/Pendencias";
 import Documentos from "./paginas/Documentos";
 import Usuarios from "./paginas/Usuarios";
 import Alertas from "./paginas/Alertas";
+
 import {
   carregarEmpresas,
   carregarPendencias,
   criarPendenciaManual,
   criarEmpresa,
   carregarUsuarios,
-  criarUsuarioReal
+  criarUsuarioReal,
+  carregarNotificacoes,
+  marcarNotificacaoComoLida
 } from "../../supabaseClient";
 
 function Sistema({ usuario, usuarios, setUsuarios, onSair }) {
   const [tela, setTela] = useState("dashboard");
   const [empresas, setEmpresas] = useState([]);
   const [pendencias, setPendencias] = useState([]);
+  const [notificacoes, setNotificacoes] = useState([]);
 
   useEffect(() => {
     async function carregarDados() {
-      const [resultadoEmpresas, resultadoPendencias] = await Promise.all([
+      const [
+        resultadoEmpresas,
+        resultadoPendencias,
+        resultadoNotificacoes
+      ] = await Promise.all([
         carregarEmpresas(),
-        carregarPendencias()
+        carregarPendencias(),
+        carregarNotificacoes()
       ]);
 
       if (!resultadoEmpresas.erro) {
@@ -36,41 +45,87 @@ function Sistema({ usuario, usuarios, setUsuarios, onSair }) {
       if (!resultadoPendencias.erro) {
         setPendencias(resultadoPendencias.dados);
       }
+
+      if (!resultadoNotificacoes.erro) {
+        setNotificacoes(resultadoNotificacoes.dados);
+      }
     }
 
     carregarDados();
   }, []);
-  async function atualizarPendencias() {
-    const resultado = await carregarPendencias();
 
-    if (!resultado.erro) {
-      setPendencias(resultado.dados);
+  async function atualizarPendencias() {
+    const [
+      resultadoPendencias,
+      resultadoNotificacoes
+    ] = await Promise.all([
+      carregarPendencias(),
+      carregarNotificacoes()
+    ]);
+
+    if (!resultadoPendencias.erro) {
+      setPendencias(resultadoPendencias.dados);
+    }
+
+    if (!resultadoNotificacoes.erro) {
+      setNotificacoes(resultadoNotificacoes.dados);
+    }
+  }
+
+  async function marcarNotificacao(id) {
+    const resultado = await marcarNotificacaoComoLida(id);
+
+    if (!resultado.sucesso) {
+      return;
+    }
+
+    const resultadoNotificacoes = await carregarNotificacoes();
+
+    if (!resultadoNotificacoes.erro) {
+      setNotificacoes(resultadoNotificacoes.dados);
     }
   }
 
   const administrador = usuario?.cargo === "Administrador";
 
   const empresasVisiveis = useMemo(() => {
-    if (administrador) return empresas;
-    return empresas.filter((empresa) => usuario?.empresas?.includes(empresa.id));
+    if (administrador) {
+      return empresas;
+    }
+
+    return empresas.filter((empresa) =>
+      usuario?.empresas?.includes(empresa.id)
+    );
   }, [administrador, empresas, usuario]);
 
   const pendenciasVisiveis = useMemo(() => {
     const ids = empresasVisiveis.map((empresa) => empresa.id);
-    return pendencias.filter((pendencia) => ids.includes(pendencia.empresaId));
+
+    return pendencias.filter((pendencia) =>
+      ids.includes(pendencia.empresaId)
+    );
   }, [empresasVisiveis, pendencias]);
 
   async function adicionarEmpresa(novaEmpresa) {
     const resultado = await criarEmpresa(novaEmpresa);
 
     if (resultado.erro) {
-      console.error("Erro ao cadastrar empresa:", resultado.erro);
+      console.error(
+        "Erro ao cadastrar empresa:",
+        resultado.erro
+      );
+
       return false;
     }
 
-    const [resultadoEmpresas, resultadoPendencias] = await Promise.all([
+    const [
+      resultadoEmpresas,
+      resultadoPendencias,
+      resultadoNotificacoes
+    ] = await Promise.all([
       carregarEmpresas(),
-      carregarPendencias()
+      carregarPendencias(),
+      carregarNotificacoes()
     ]);
 
     if (!resultadoEmpresas.erro) {
@@ -81,38 +136,49 @@ function Sistema({ usuario, usuarios, setUsuarios, onSair }) {
       setPendencias(resultadoPendencias.dados);
     }
 
+    if (!resultadoNotificacoes.erro) {
+      setNotificacoes(resultadoNotificacoes.dados);
+    }
+
     return true;
   }
 
   async function adicionarPendencia(novaPendencia) {
-    const resultado = await criarPendenciaManual(novaPendencia);
+    const resultado =
+      await criarPendenciaManual(novaPendencia);
 
     if (resultado.erro) {
-      console.error("Erro ao cadastrar pendência:", resultado.erro);
+      console.error(
+        "Erro ao cadastrar pendência:",
+        resultado.erro
+      );
+
       return false;
     }
 
-    const resultadoPendencias = await carregarPendencias();
-
-    if (!resultadoPendencias.erro) {
-      setPendencias(resultadoPendencias.dados);
-    }
+    await atualizarPendencias();
 
     return true;
   }
 
   async function adicionarUsuario(novoUsuario) {
-    const resultado = await criarUsuarioReal(novoUsuario);
+    const resultado =
+      await criarUsuarioReal(novoUsuario);
 
     if (resultado.erro) {
-      console.error("Erro ao criar usuário:", resultado.erro);
+      console.error(
+        "Erro ao criar usuário:",
+        resultado.erro
+      );
+
       return {
         sucesso: false,
         erro: resultado.erro
       };
     }
 
-    const resultadoUsuarios = await carregarUsuarios();
+    const resultadoUsuarios =
+      await carregarUsuarios();
 
     if (!resultadoUsuarios.erro) {
       setUsuarios(resultadoUsuarios.dados);
@@ -126,45 +192,83 @@ function Sistema({ usuario, usuarios, setUsuarios, onSair }) {
 
   const paginas = administrador
     ? {
-      dashboard: <Painel empresas={empresas} pendencias={pendencias} />,
-      alertas: <Alertas pendencias={pendenciasVisiveis} />,
-      empresas: <Empresas empresas={empresas} onAdicionar={adicionarEmpresa} />,
-      pendencias: (
-        <Pendencias
-          empresas={empresas}
-          pendencias={pendencias}
-          onAdicionar={adicionarPendencia}
-        />
-      ),
-      documentos: <Documentos
-        empresas={empresasVisiveis}
-        usuario={usuario}
-        onDocumentoEnviado={atualizarPendencias}
-      />,
-      usuarios: (
-        <Usuarios
-          usuarios={usuarios}
-          empresas={empresas}
-          onAdicionar={adicionarUsuario}
-        />
-      )
-    }
+        dashboard: (
+          <Painel
+            empresas={empresas}
+            pendencias={pendencias}
+          />
+        ),
+
+        alertas: (
+          <Alertas
+            notificacoes={notificacoes}
+            onMarcarLida={marcarNotificacao}
+          />
+        ),
+
+        empresas: (
+          <Empresas
+            empresas={empresas}
+            onAdicionar={adicionarEmpresa}
+          />
+        ),
+
+        pendencias: (
+          <Pendencias
+            empresas={empresas}
+            pendencias={pendencias}
+            onAdicionar={adicionarPendencia}
+          />
+        ),
+
+        documentos: (
+          <Documentos
+            empresas={empresasVisiveis}
+            usuario={usuario}
+            onDocumentoEnviado={atualizarPendencias}
+          />
+        ),
+
+        usuarios: (
+          <Usuarios
+            usuarios={usuarios}
+            empresas={empresas}
+            onAdicionar={adicionarUsuario}
+          />
+        )
+      }
     : {
-      dashboard: <PainelGestor usuario={usuario} empresas={empresasVisiveis} pendencias={pendenciasVisiveis} />,
-      alertas: <Alertas pendencias={pendenciasVisiveis} />,
-      pendencias: (
-        <Pendencias
-          empresas={empresasVisiveis}
-          pendencias={pendenciasVisiveis}
-          onAdicionar={adicionarPendencia}
-        />
-      ),
-      documentos: <Documentos
-        empresas={empresasVisiveis}
-        usuario={usuario}
-        onDocumentoEnviado={atualizarPendencias}
-      />
-    };
+        dashboard: (
+          <PainelGestor
+            usuario={usuario}
+            empresas={empresasVisiveis}
+            pendencias={pendenciasVisiveis}
+          />
+        ),
+
+        alertas: (
+          <Alertas
+            notificacoes={notificacoes}
+            onMarcarLida={marcarNotificacao}
+          />
+        ),
+
+        pendencias: (
+          <Pendencias
+            empresas={empresasVisiveis}
+            pendencias={pendenciasVisiveis}
+            onAdicionar={adicionarPendencia}
+          />
+        ),
+
+        documentos: (
+          <Documentos
+            empresas={empresasVisiveis}
+            usuario={usuario}
+            onDocumentoEnviado={atualizarPendencias}
+          />
+        )
+      };
 
   return (
     <div className="system">
@@ -174,8 +278,10 @@ function Sistema({ usuario, usuarios, setUsuarios, onSair }) {
         onSair={onSair}
         administrador={administrador}
       />
+
       <main className="system-main">
         <BarraSuperior usuario={usuario} />
+
         <div className="page-content">
           {paginas[tela] || paginas.dashboard}
         </div>
