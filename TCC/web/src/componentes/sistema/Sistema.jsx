@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
+import Documentos from "./paginas/Documentos";
 import Painel from "./paginas/Painel";
+import Historico from "./paginas/Historico";
 import Pendencias from "./paginas/Pendencias";
+import Alertas from "./paginas/Alertas";
 import { supabase } from "../../supabaseClient";
 import BarraLateral from "./BarraLateral";
 import BarraSuperior from "./BarraSuperior";
@@ -86,6 +89,17 @@ function Sistema({ usuario, onSair }) {
   }
 
   function renderizarPagina() {
+    if (tela === "historico") {
+  return <Historico empresas={empresas} />;
+}
+    if (tela === "alertas") {
+  return (
+    <Alertas
+      usuario={usuario}
+      empresas={empresas}
+    />
+  );
+}
     if (carregando) {
       return <p>Carregando dados do Supabase...</p>;
     }
@@ -115,6 +129,16 @@ function Sistema({ usuario, onSair }) {
     if (tela === "pendencias") {
   return <Pendencias empresas={empresas} />;
 }
+
+if (tela === "documentos") {
+  return (
+    <Documentos
+      empresas={empresas}
+      usuario={usuario}
+    />
+  );
+}
+
 
     if (tela === "dashboard") {
   return (
