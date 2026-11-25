@@ -2,7 +2,8 @@ import {
   testarConexao,
   verificarSessao,
   carregarUsuarioDaSessao,
-  sairDoSupabase
+  sairDoSupabase,
+  carregarUsuarios
 } from "./supabaseClient";
 import { useEffect } from "react";
 import { useState } from "react";
@@ -14,7 +15,7 @@ import Sistema from "./componentes/sistema/Sistema";
 function Aplicacao() {
   const [tela, setTela] = useState("inicio");
   const [usuario, setUsuario] = useState(null);
-  const [usuarios, setUsuarios] = useState(usuariosIniciais);
+  const [usuarios, setUsuarios] = useState([]);
   useEffect(() => {
     async function restaurarSessao() {
       testarConexao();
@@ -24,6 +25,15 @@ function Aplicacao() {
 
       if (resultado.usuario) {
         setUsuario(resultado.usuario);
+
+        if (resultado.usuario.cargo === "Administrador") {
+          const resultadoUsuarios = await carregarUsuarios();
+
+          if (!resultadoUsuarios.erro) {
+            setUsuarios(resultadoUsuarios.dados);
+          }
+        }
+
         setTela("dashboard");
       }
     }
@@ -31,8 +41,17 @@ function Aplicacao() {
     restaurarSessao();
   }, []);
 
-  function entrar(usuarioLogado) {
+  async function entrar(usuarioLogado) {
     setUsuario(usuarioLogado);
+
+    if (usuarioLogado.cargo === "Administrador") {
+      const resultadoUsuarios = await carregarUsuarios();
+
+      if (!resultadoUsuarios.erro) {
+        setUsuarios(resultadoUsuarios.dados);
+      }
+    }
+
     setTela("dashboard");
   }
 

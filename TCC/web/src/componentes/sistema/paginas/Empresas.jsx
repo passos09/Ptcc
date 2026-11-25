@@ -17,10 +17,19 @@ function Empresas({ empresas, onAdicionar }) {
     setSalvou(false);
   }
 
-  function salvar(evento) {
+  async function salvar(evento) {
     evento.preventDefault();
-    if (!formulario.nome || !formulario.cnpj) return;
-    onAdicionar(formulario);
+
+    if (!formulario.nome || !formulario.cnpj) {
+      return;
+    }
+
+    const sucesso = await onAdicionar(formulario);
+
+    if (!sucesso) {
+      return;
+    }
+
     setFormulario(formularioInicial);
     setSalvou(true);
   }

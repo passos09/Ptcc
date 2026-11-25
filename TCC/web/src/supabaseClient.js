@@ -508,3 +508,136 @@ export async function sairDoSupabase() {
     erro: error?.message || null
   };
 }
+export async function criarEmpresa({
+  nome,
+  cnpj,
+  telefone,
+  endereco,
+  email
+}) {
+  const cnpjLimpo = cnpj.replace(/\D/g, "");
+
+  const { data, error } = await supabase
+    .from("empresa")
+    .insert({
+      razao_social: nome.trim(),
+      nome_fantasia: nome.trim(),
+      cnpj: cnpjLimpo,
+      telefone: telefone?.trim() || null,
+      endereco: endereco?.trim() || null,
+      email_contato: email?.trim() || null,
+      ativa: true
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Erro ao cadastrar empresa:", error.message);
+
+    return {
+      empresa: null,
+      erro: error.message
+    };
+  }
+
+  return {
+    empresa: data,
+    erro: null
+  };
+}
+export async function carregarUsuarios() {
+  const [
+    { data: usuarios, error: usuariosError },
+    { data: perfis, error: perfisError }
+  ] = await Promise.all([
+    supabase
+      .from("usuario")
+      .select("id, nome, email, perfil_id, empresa_id, ativo")
+      .order("id"),
+
+    supabase
+      .from("perfil")
+      .select("id, nome")
+  ]);
+
+  if (usuariosError || perfisError) {
+    const erro =
+      usuariosError?.message ||
+      perfisError?.message;
+
+    console.error("Erro ao carregar usuários:", erro);
+
+    return {
+      dados: [],
+      erro
+    };
+  }
+
+  const mapaPerfis = new Map(
+    perfis.map((perfil) => [perfil.id, perfil.nome])
+  );
+
+  const dados = usuarios.map((usuario) => ({
+    id: usuario.id,
+    nome: usuario.nome,
+    email: usuario.email,
+    cargo: mapaPerfis.get(usuario.perfil_id) || "Usuário",
+    empresaId: usuario.empresa_id,
+    ativo: usuario.ativo
+  }));
+
+  return {
+    dados,
+    erro: null
+  };
+}
+
+export async function criarUsuarioReal({
+  nome,
+  email,
+  senha,
+  cargo,
+  empresaId
+}) {
+  const { data, error } = await supabase.functions.invoke(
+    "criar-usuario",
+    {
+      body: {
+        nome: nome.trim(),
+        email: email.trim().toLowerCase(),
+        senha,
+        perfil: cargo,
+        empresa_id:
+          cargo === "Gestor"
+            ? Number(empresaId)
+            : null
+      }
+    }
+  );
+
+  if (error) {
+    let mensagem = error.message;
+
+    try {
+      const resposta = await error.context.json();
+
+      if (resposta?.erro) {
+        mensagem = resposta.erro;
+      }
+    } catch {
+      // mantém a mensagem original
+    }
+
+    console.error("Erro ao criar usuário:", mensagem);
+
+    return {
+      usuario: null,
+      erro: mensagem
+    };
+  }
+
+  return {
+    usuario: data?.usuario || null,
+    erro: null
+  };
+} 

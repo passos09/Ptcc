@@ -11,7 +11,10 @@ import Alertas from "./paginas/Alertas";
 import {
   carregarEmpresas,
   carregarPendencias,
-  criarPendenciaManual
+  criarPendenciaManual,
+  criarEmpresa,
+  carregarUsuarios,
+  criarUsuarioReal
 } from "../../supabaseClient";
 
 function Sistema({ usuario, usuarios, setUsuarios, onSair }) {
@@ -57,8 +60,28 @@ function Sistema({ usuario, usuarios, setUsuarios, onSair }) {
     return pendencias.filter((pendencia) => ids.includes(pendencia.empresaId));
   }, [empresasVisiveis, pendencias]);
 
-  function adicionarEmpresa(novaEmpresa) {
-    setEmpresas((atuais) => [...atuais, { ...novaEmpresa, id: Date.now() }]);
+  async function adicionarEmpresa(novaEmpresa) {
+    const resultado = await criarEmpresa(novaEmpresa);
+
+    if (resultado.erro) {
+      console.error("Erro ao cadastrar empresa:", resultado.erro);
+      return false;
+    }
+
+    const [resultadoEmpresas, resultadoPendencias] = await Promise.all([
+      carregarEmpresas(),
+      carregarPendencias()
+    ]);
+
+    if (!resultadoEmpresas.erro) {
+      setEmpresas(resultadoEmpresas.dados);
+    }
+
+    if (!resultadoPendencias.erro) {
+      setPendencias(resultadoPendencias.dados);
+    }
+
+    return true;
   }
 
   async function adicionarPendencia(novaPendencia) {
@@ -78,8 +101,27 @@ function Sistema({ usuario, usuarios, setUsuarios, onSair }) {
     return true;
   }
 
-  function adicionarUsuario(novoUsuario) {
-    setUsuarios((atuais) => [...atuais, { ...novoUsuario, id: Date.now(), senha: "123456", empresas: [] }]);
+  async function adicionarUsuario(novoUsuario) {
+    const resultado = await criarUsuarioReal(novoUsuario);
+
+    if (resultado.erro) {
+      console.error("Erro ao criar usuário:", resultado.erro);
+      return {
+        sucesso: false,
+        erro: resultado.erro
+      };
+    }
+
+    const resultadoUsuarios = await carregarUsuarios();
+
+    if (!resultadoUsuarios.erro) {
+      setUsuarios(resultadoUsuarios.dados);
+    }
+
+    return {
+      sucesso: true,
+      erro: null
+    };
   }
 
   const paginas = administrador
@@ -99,7 +141,13 @@ function Sistema({ usuario, usuarios, setUsuarios, onSair }) {
         usuario={usuario}
         onDocumentoEnviado={atualizarPendencias}
       />,
-      usuarios: <Usuarios usuarios={usuarios} onAdicionar={adicionarUsuario} />
+      usuarios: (
+        <Usuarios
+          usuarios={usuarios}
+          empresas={empresas}
+          onAdicionar={adicionarUsuario}
+        />
+      )
     }
     : {
       dashboard: <PainelGestor usuario={usuario} empresas={empresasVisiveis} pendencias={pendenciasVisiveis} />,
