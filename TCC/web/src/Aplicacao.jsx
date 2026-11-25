@@ -1,7 +1,5 @@
-import { testarConexao, verificarSessao } from "./supabaseClient";
-import { useEffect } from "react";
 import { useState } from "react";
-import { usuariosIniciais } from "./dados";
+import { supabase } from "./supabaseClient";
 import PaginaInicial from "./componentes/inicio/PaginaInicial";
 import TelaEntrada from "./componentes/sistema/TelaEntrada";
 import Sistema from "./componentes/sistema/Sistema";
@@ -9,31 +7,51 @@ import Sistema from "./componentes/sistema/Sistema";
 function Aplicacao() {
   const [tela, setTela] = useState("inicio");
   const [usuario, setUsuario] = useState(null);
-  const [usuarios, setUsuarios] = useState(usuariosIniciais);
-useEffect(() => {
-  testarConexao();
-  verificarSessao();
-}, []);
+  const [usuarios, setUsuarios] = useState([]);
 
   function entrar(usuarioLogado) {
     setUsuario(usuarioLogado);
     setTela("dashboard");
   }
 
-  function sair() {
+  async function sair() {
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      alert("Não foi possível encerrar a sessão.");
+      return;
+    }
+
     setUsuario(null);
+    setUsuarios([]);
     setTela("inicio");
   }
 
   if (tela === "inicio") {
-    return <PaginaInicial onEntrar={() => setTela("login")} />;
+    return (
+      <PaginaInicial
+        onEntrar={() => setTela("login")}
+      />
+    );
   }
 
-  if (tela === "login") {
-    return <TelaEntrada usuarios={usuarios} onLogin={entrar} onVoltar={() => setTela("inicio")} />;
+  if (tela === "login" || !usuario) {
+    return (
+      <TelaEntrada
+        onLogin={entrar}
+        onVoltar={() => setTela("inicio")}
+      />
+    );
   }
 
-  return <Sistema usuario={usuario} usuarios={usuarios} setUsuarios={setUsuarios} onSair={sair} />;
+  return (
+    <Sistema
+      usuario={usuario}
+      usuarios={usuarios}
+      setUsuarios={setUsuarios}
+      onSair={sair}
+    />
+  );
 }
 
 export default Aplicacao;
