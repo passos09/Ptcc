@@ -1,4 +1,9 @@
-import { testarConexao, verificarSessao } from "./supabaseClient";
+import {
+  testarConexao,
+  verificarSessao,
+  carregarUsuarioDaSessao,
+  sairDoSupabase
+} from "./supabaseClient";
 import { useEffect } from "react";
 import { useState } from "react";
 import { usuariosIniciais } from "./dados";
@@ -10,17 +15,29 @@ function Aplicacao() {
   const [tela, setTela] = useState("inicio");
   const [usuario, setUsuario] = useState(null);
   const [usuarios, setUsuarios] = useState(usuariosIniciais);
-useEffect(() => {
-  testarConexao();
-  verificarSessao();
-}, []);
+  useEffect(() => {
+    async function restaurarSessao() {
+      testarConexao();
+      verificarSessao();
+
+      const resultado = await carregarUsuarioDaSessao();
+
+      if (resultado.usuario) {
+        setUsuario(resultado.usuario);
+        setTela("dashboard");
+      }
+    }
+
+    restaurarSessao();
+  }, []);
 
   function entrar(usuarioLogado) {
     setUsuario(usuarioLogado);
     setTela("dashboard");
   }
 
-  function sair() {
+  async function sair() {
+    await sairDoSupabase();
     setUsuario(null);
     setTela("inicio");
   }

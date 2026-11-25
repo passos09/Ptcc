@@ -444,3 +444,67 @@ export async function baixarDocumento(caminho) {
     erro: null
   };
 }
+export async function carregarUsuarioDaSessao() {
+  const { data: sessaoData, error: sessaoError } =
+    await supabase.auth.getSession();
+
+  if (sessaoError || !sessaoData.session?.user) {
+    return {
+      usuario: null,
+      erro: sessaoError?.message || null
+    };
+  }
+
+  const authUser = sessaoData.session.user;
+
+  const { data: usuarioBanco, error: usuarioError } = await supabase
+    .from("usuario")
+    .select("id, nome, email, perfil_id, empresa_id, ativo")
+    .eq("auth_user_id", authUser.id)
+    .eq("ativo", true)
+    .single();
+
+  if (usuarioError || !usuarioBanco) {
+    return {
+      usuario: null,
+      erro: usuarioError?.message || "Usuário não encontrado."
+    };
+  }
+
+  const { data: perfil, error: perfilError } = await supabase
+    .from("perfil")
+    .select("nome")
+    .eq("id", usuarioBanco.perfil_id)
+    .single();
+
+  if (perfilError || !perfil) {
+    return {
+      usuario: null,
+      erro: "Não foi possível identificar o perfil."
+    };
+  }
+
+  return {
+    usuario: {
+      id: usuarioBanco.id,
+      nome: usuarioBanco.nome,
+      email: usuarioBanco.email,
+      cargo: perfil.nome,
+      empresas:
+        perfil.nome === "Administrador"
+          ? []
+          : usuarioBanco.empresa_id
+            ? [usuarioBanco.empresa_id]
+            : []
+    },
+    erro: null
+  };
+}
+
+export async function sairDoSupabase() {
+  const { error } = await supabase.auth.signOut();
+
+  return {
+    erro: error?.message || null
+  };
+}
