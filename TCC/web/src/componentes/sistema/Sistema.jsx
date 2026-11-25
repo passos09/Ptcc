@@ -1,71 +1,142 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "../../supabaseClient";
 import BarraLateral from "./BarraLateral";
 import BarraSuperior from "./BarraSuperior";
-import Painel from "./paginas/Painel";
-import PainelGestor from "./paginas/PainelGestor";
 import Empresas from "./paginas/Empresas";
-import Pendencias from "./paginas/Pendencias";
-import Documentos from "./paginas/Documentos";
-import Usuarios from "./paginas/Usuarios";
-import Alertas from "./paginas/Alertas";
-import { empresasIniciais, pendenciasIniciais } from "../../dados";
 
-function Sistema({ usuario, usuarios, setUsuarios, onSair }) {
+function formatarEmpresa(empresa) {
+  return {
+    ...empresa,
+    nome: empresa.razao_social,
+    email: empresa.email_contato
+  };
+}
+
+function Sistema({ usuario, onSair }) {
   const [tela, setTela] = useState("dashboard");
-  const [empresas, setEmpresas] = useState(empresasIniciais);
-  const [pendencias, setPendencias] = useState(pendenciasIniciais);
+  const [empresas, setEmpresas] = useState([]);
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState("");
 
   const administrador = usuario?.cargo === "Administrador";
 
-  const empresasVisiveis = useMemo(() => {
-    if (administrador) return empresas;
-    return empresas.filter((empresa) => usuario?.empresas?.includes(empresa.id));
-  }, [administrador, empresas, usuario]);
+  useEffect(() => {
+    carregarEmpresas();
+  }, []);
 
-  const pendenciasVisiveis = useMemo(() => {
-    const ids = empresasVisiveis.map((empresa) => empresa.id);
-    return pendencias.filter((pendencia) => ids.includes(pendencia.empresaId));
-  }, [empresasVisiveis, pendencias]);
+  async function carregarEmpresas() {
+    setCarregando(true);
+    setErro("");
 
-  function adicionarEmpresa(novaEmpresa) {
-    setEmpresas((atuais) => [...atuais, { ...novaEmpresa, id: Date.now() }]);
+    try {
+      const { data, error } = await supabase
+        .from("empresa")
+        .select("*")
+        .eq("ativa", true)
+        .order("razao_social");
+
+      if (error) throw error;
+
+      setEmpresas(data.map(formatarEmpresa));
+    } catch (error) {
+      setErro("Erro ao carregar empresas: " + error.message);
+    } finally {
+      setCarregando(false);
+    }
   }
 
-  function adicionarPendencia(novaPendencia) {
-    setPendencias((atuais) => [...atuais, { ...novaPendencia, id: Date.now() }]);
-  }
+  async function adicionarEmpresa(novaEmpresa) {
+    if (!administrador) {
+      throw new Error("Acesso não autorizado.");
+    }
 
-  function adicionarUsuario(novoUsuario) {
-    setUsuarios((atuais) => [...atuais, { ...novoUsuario, id: Date.now(), senha: "123456", empresas: [] }]);
-  }
+    const cnpj = novaEmpresa.cnpj.replace(/\D/g, "");
 
-  const paginas = administrador
-    ? {
-        dashboard: <Painel empresas={empresas} pendencias={pendencias} />,
-        alertas: <Alertas pendencias={pendenciasVisiveis} />,
-        empresas: <Empresas empresas={empresas} onAdicionar={adicionarEmpresa} />,
-        pendencias: (
-          <Pendencias
-            empresas={empresas}
-            pendencias={pendencias}
-            onAdicionar={adicionarPendencia}
-          />
-        ),
-        documentos: <Documentos empresas={empresasVisiveis} />,
-        usuarios: <Usuarios usuarios={usuarios} onAdicionar={adicionarUsuario} />
+    if (cnpj.length !== 14) {
+      throw new Error("O CNPJ deve possuir 14 números.");
+    }
+
+    const { data, error } = await supabase
+      .from("empresa")
+      .insert({
+        razao_social: novaEmpresa.nome.trim(),
+        cnpj: cnpj,
+        telefone: novaEmpresa.telefone.trim() || null,
+        endereco: novaEmpresa.endereco.trim() || null,
+        email_contato: novaEmpresa.email.trim() || null
+      })
+      .select()
+      .single();
+
+    if (error) {
+      if (error.code === "23505") {
+        throw new Error("Este CNPJ já está cadastrado.");
       }
-    : {
-        dashboard: <PainelGestor usuario={usuario} empresas={empresasVisiveis} pendencias={pendenciasVisiveis} />,
-        alertas: <Alertas pendencias={pendenciasVisiveis} />,
-        pendencias: (
-          <Pendencias
-            empresas={empresasVisiveis}
-            pendencias={pendenciasVisiveis}
-            onAdicionar={adicionarPendencia}
-          />
-        ),
-        documentos: <Documentos empresas={empresasVisiveis} />
-      };
+
+      throw new Error(error.message);
+    }
+
+    setEmpresas((atuais) =>
+      [...atuais, formatarEmpresa(data)].sort(
+        (a, b) => a.nome.localeCompare(b.nome)
+      )
+    );
+  }
+
+  function renderizarPagina() {
+    if (carregando) {
+      return <p>Carregando dados do Supabase...</p>;
+    }
+
+    if (erro) {
+      return (
+        <section className="panel">
+          <p>{erro}</p>
+          <button
+            className="button-primary"
+            onClick={carregarEmpresas}
+          >
+            Tentar novamente
+          </button>
+        </section>
+      );
+    }
+
+    if (tela === "empresas" && administrador) {
+      return (
+        <Empresas
+          empresas={empresas}
+          onAdicionar={adicionarEmpresa}
+        />
+      );
+    }
+
+    if (tela === "dashboard") {
+      return (
+        <>
+          <div className="page-title">
+            <div>
+              <span>GERAL</span>
+              <h1>Visão geral</h1>
+            </div>
+          </div>
+
+          <section className="panel">
+            <h2>Empresas monitoradas: {empresas.length}</h2>
+            <p>Dados consultados diretamente do Supabase.</p>
+            <p>Indicadores documentais em integração.</p>
+          </section>
+        </>
+      );
+    }
+
+    return (
+      <section className="panel">
+        <h2>Módulo em integração</h2>
+        <p>Esta funcionalidade está sendo conectada ao banco de dados.</p>
+      </section>
+    );
+  }
 
   return (
     <div className="system">
@@ -75,10 +146,12 @@ function Sistema({ usuario, usuarios, setUsuarios, onSair }) {
         onSair={onSair}
         administrador={administrador}
       />
+
       <main className="system-main">
         <BarraSuperior usuario={usuario} />
+
         <div className="page-content">
-          {paginas[tela] || paginas.dashboard}
+          {renderizarPagina()}
         </div>
       </main>
     </div>
@@ -86,3 +159,4 @@ function Sistema({ usuario, usuarios, setUsuarios, onSair }) {
 }
 
 export default Sistema;
+
