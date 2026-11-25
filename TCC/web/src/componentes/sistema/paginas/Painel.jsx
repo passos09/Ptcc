@@ -1,43 +1,197 @@
-function Painel({ empresas = [], pendencias = [] }) {
-  const pendentes = pendencias.filter((item) => item.status === "Pendente").length;
-  const alertas = pendencias.filter((item) => item.status !== "Regular").length;
-  const regulares = pendencias.filter((item) => item.status === "Regular").length;
+import { useEffect, useState } from "react";
+import { supabase } from "../../../supabaseClient";
+
+function Painel({ empresas = [], usuario }) {
+  const [pendencias, setPendencias] = useState([]);
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState("");
+
+  useEffect(() => {
+    carregarPendencias();
+  }, []);
+
+  async function carregarPendencias() {
+    const { data, error } = await supabase
+      .from("pendencia")
+      .select("*")
+      .order("criado_em", { ascending: false });
+
+    if (error) {
+      setErro(error.message);
+    } else {
+      setPendencias(data);
+    }
+
+    setCarregando(false);
+  }
+
+  const registros = pendencias.filter((p) =>
+    empresas.some((e) => e.id === p.empresa_id)
+  );
+
+  const abertas = registros.filter((p) =>
+    ["aberta", "em_andamento"].includes(p.status)
+  );
+
+  const resolvidas = registros.filter(
+    (p) => p.status === "resolvida"
+  );
+
+  const alertas = abertas.filter(
+    (p) => [2, 3].includes(p.tipo_id)
+  );
+
+  const empresasComPendencia = empresas.filter((e) =>
+    abertas.some((p) => p.empresa_id === e.id)
+  );
+
+  const total = abertas.length + resolvidas.length;
+
+  const percentual = total
+    ? Math.round(resolvidas.length / total * 100)
+    : 0;
+
+  if (carregando) {
+    return <p>Carregando dashboard...</p>;
+  }
+
+  if (erro) {
+    return <p>Erro ao carregar painel: {erro}</p>;
+  }
 
   return (
     <>
-      <div className="page-title"><div><span>GERAL</span><h1>Visão geral</h1></div></div>
+      <div className="page-title">
+        <div>
+          <span>{usuario?.cargo || "GERAL"}</span>
+          <h1>Visão geral</h1>
+        </div>
+      </div>
+
+      <p className="panel-description">
+        Ambiente acadêmico — indicadores documentais
+        não comprovam regularidade fiscal.
+      </p>
+
       <section className="overview-card">
-        <div className="gauge"><div><strong>82%</strong><span>REGULARIDADE</span></div></div>
+        <div
+          className="gauge"
+          style={{
+            background: `conic-gradient(
+              var(--green) ${percentual}%,
+              var(--line) 0
+            )`
+          }}
+        >
+          <div>
+            <strong>{total ? `${percentual}%` : "—"}</strong>
+            <span>RESOLUÇÃO</span>
+          </div>
+        </div>
+
         <div className="overview-text">
-          <h2>{empresas.length} empresas sob monitoramento contínuo</h2>
-          <p>O sistema acompanha pendências fiscais e documentais por empresa, mantendo as informações organizadas e destacando o que precisa de atenção.</p>
-          <div className="mini-tags"><span>{regulares} em dia</span><span>{pendentes} pendentes</span><span>{alertas} alertas ativos</span></div>
+          <h2>
+            {empresas.length} empresas sob monitoramento
+          </h2>
+
+          <p>
+            Acompanhe as pendências, os alertas de
+            vencimento e os registros resolvidos.
+          </p>
+
+          <div className="mini-tags">
+            <span>{resolvidas.length} resolvidas</span>
+            <span>{abertas.length} em aberto</span>
+            <span>{alertas.length} alertas ativos</span>
+          </div>
         </div>
       </section>
 
       <div className="metric-grid">
-        <Metrica valor={String(Math.max(0, pendencias.length - pendentes))} texto="Pendências regulares" />
-        <Metrica valor={String(pendentes).padStart(2, "0")} texto="Pendências em aberto" alerta />
-        <Metrica valor={String(alertas).padStart(2, "0")} texto="Alertas ativos" alerta />
-        <Metrica valor={String(empresas.length).padStart(2, "0")} texto="Empresas monitoradas" />
+        <Metrica
+          valor={resolvidas.length}
+          texto="Pendências resolvidas"
+        />
+
+        <Metrica
+          valor={abertas.length}
+          texto="Pendências em aberto"
+          alerta
+        />
+
+        <Metrica
+          valor={alertas.length}
+          texto="Alertas de vencimento"
+          alerta
+        />
+
+        <Metrica
+          valor={empresas.length}
+          texto="Empresas monitoradas"
+        />
       </div>
 
       <div className="dashboard-grid">
         <section className="panel">
-          <div className="panel-title"><h2>Empresas com pendência</h2></div>
+          <div className="panel-title">
+            <h2>Situação das empresas</h2>
+          </div>
+
           {empresas.map((empresa) => {
-            const empresaPendencias = pendencias.filter((item) => item.empresaId === empresa.id);
-            const status = empresaPendencias.some((item) => item.status === "Pendente") ? "Pendente" : empresaPendencias.length ? "Atenção" : "Regular";
-            return <LinhaEmpresa key={empresa.id} nome={empresa.nome} cnpj={empresa.cnpj} status={status} />;
+            const quantidade = abertas.filter(
+              (p) => p.empresa_id === empresa.id
+            ).length;
+
+            return (
+              <div className="company-row" key={empresa.id}>
+                <div>
+                  <strong>{empresa.nome}</strong>
+                  <small>{empresa.cnpj}</small>
+                </div>
+
+                <span
+                  className={`status ${
+                    quantidade
+                      ? "status-atencao"
+                      : "status-regular"
+                  }`}
+                >
+                  {quantidade
+                    ? `${quantidade} pendência(s)`
+                    : "Sem pendências abertas"}
+                </span>
+              </div>
+            );
           })}
         </section>
 
         <section className="panel">
-          <div className="panel-title"><h2>Situação documental: atenção</h2><span className="dot-alert">●</span></div>
-          <div className="alert-box"><strong>{alertas} ocorrência(s) precisam de atenção.</strong></div>
-          <h3 className="subheading">Últimos alertas</h3>
-          {pendencias.filter((item) => item.status !== "Regular").slice(0, 2).map((item) => (
-            <div className="small-alert" key={item.id}><span className={`alert-icon ${item.status === "Atenção" ? "yellow" : ""}`}>!</span><div><strong>{item.descricao}</strong><small>{item.vencimento}</small></div><small>{item.status}</small></div>
+          <div className="panel-title">
+            <h2>Pendências ativas</h2>
+          </div>
+
+          <div className="alert-box">
+            <strong>
+              {empresasComPendencia.length} empresa(s)
+              precisam de acompanhamento.
+            </strong>
+          </div>
+
+          {abertas.slice(0, 5).map((item) => (
+            <div className="small-alert" key={item.id}>
+              <span className="alert-icon yellow">!</span>
+
+              <div>
+                <strong>{item.titulo}</strong>
+                <small>
+                  {empresas.find(
+                    (e) => e.id === item.empresa_id
+                  )?.nome}
+                </small>
+              </div>
+
+              <small>{item.prioridade}</small>
+            </div>
           ))}
         </section>
       </div>
@@ -46,11 +200,14 @@ function Painel({ empresas = [], pendencias = [] }) {
 }
 
 function Metrica({ valor, texto, alerta }) {
-  return <div className="metric"><strong className={alerta ? "metric-alert" : ""}>{valor}</strong><span>{texto}</span></div>;
-}
-
-function LinhaEmpresa({ nome, cnpj, status }) {
-  return <div className="company-row"><div><strong>{nome}</strong><small>{cnpj}</small></div><span className={`status status-${status.toLowerCase().replace("ã", "a")}`}>{status}</span></div>;
+  return (
+    <div className="metric">
+      <strong className={alerta ? "metric-alert" : ""}>
+        {valor}
+      </strong>
+      <span>{texto}</span>
+    </div>
+  );
 }
 
 export default Painel;

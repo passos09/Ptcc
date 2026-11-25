@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import Painel from "./paginas/Painel";
+import Pendencias from "./paginas/Pendencias";
 import { supabase } from "../../supabaseClient";
 import BarraLateral from "./BarraLateral";
 import BarraSuperior from "./BarraSuperior";
@@ -110,26 +112,19 @@ function Sistema({ usuario, onSair }) {
         />
       );
     }
+    if (tela === "pendencias") {
+  return <Pendencias empresas={empresas} />;
+}
 
     if (tela === "dashboard") {
-      return (
-        <>
-          <div className="page-title">
-            <div>
-              <span>GERAL</span>
-              <h1>Visão geral</h1>
-            </div>
-          </div>
-
-          <section className="panel">
-            <h2>Empresas monitoradas: {empresas.length}</h2>
-            <p>Dados consultados diretamente do Supabase.</p>
-            <p>Indicadores documentais em integração.</p>
-          </section>
-        </>
-      );
-    }
-
+  return (
+    <Painel
+      empresas={empresas}
+      usuario={usuario}
+    />
+  );
+}
+ 
     return (
       <section className="panel">
         <h2>Módulo em integração</h2>
