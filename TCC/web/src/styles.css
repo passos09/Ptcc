@@ -1612,3 +1612,17 @@ body,
     max-width: 100%;
   }
 }
+img.brand-mark {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  background: transparent;
+  flex-shrink: 0;
+}
+
+img.login-logo {
+  width: 85px;
+  height: 85px;
+  object-fit: contain;
+  background: transparent;
+}

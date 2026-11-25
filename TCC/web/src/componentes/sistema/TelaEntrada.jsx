@@ -70,7 +70,11 @@ function TelaEntrada({ onLogin, onVoltar }) {
       </button>
 
       <div className="login-box">
-        <span className="login-logo">D</span>
+        <img
+        src="/favicon.png"
+        alt="DOC-SYSTEM"
+        className="login-logo"
+        />
         <span className="section-label">ACESSO RESTRITO</span>
 
         <h1>Entrar</h1>

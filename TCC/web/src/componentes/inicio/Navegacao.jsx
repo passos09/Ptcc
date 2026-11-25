@@ -1,7 +1,10 @@
 function Navegacao({ onEntrar }) {
   return (
     <header className="site-navbar">
-      <div className="brand"><span className="brand-mark">D</span><span>3DS - DOC-SYSTEM</span></div>
+      <div className="brand">
+        <img src="/favicon.png" alt="DOC-SYSTEM" className="brand-mark" />
+        <span>3DS - DOC-SYSTEM</span>
+      </div>
       <nav>
         <a href="#como-funciona">Como funciona</a>
         <a href="#recursos">Recursos</a>

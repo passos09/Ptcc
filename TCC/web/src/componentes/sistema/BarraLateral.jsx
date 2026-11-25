@@ -14,7 +14,11 @@ function BarraLateral({ tela, onMudarTela, onSair, administrador }) {
   return (
     <aside className="sidebar">
       <div className="sidebar-brand">
-        <span className="brand-mark">D</span>
+        <img
+        src="/favicon.png"
+        alt="DOC-SYSTEM"
+        className="brand-mark"
+        />
         <div>
           <strong>3DS - DOC-SYSTEM</strong>
           <small>v1.0 • fiscal</small>
