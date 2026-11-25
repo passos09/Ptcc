@@ -1626,3 +1626,452 @@ img.login-logo {
   object-fit: contain;
   background: transparent;
 }
+
+.landing,
+.login-page,
+.system {
+  background: linear-gradient(180deg, #050f0d 0%, #071613 55%, #081916 100%);
+}
+
+.login-shape,
+.login-shape-one,
+.login-shape-two {
+  display: none !important;
+}
+
+.landing {
+  background: linear-gradient(180deg, #050f0d 0%, #071613 55%, #081916 100%) !important;
+}
+
+.site-navbar,
+.hero,
+.section,
+.stats,
+.landing-cta,
+footer {
+  width: min(1180px, calc(100% - 64px));
+}
+
+.site-navbar {
+  padding: 26px 0;
+}
+
+.hero {
+  min-height: 560px;
+  gap: 64px;
+  padding: 24px 0 10px;
+}
+
+.hero h1 {
+  font-size: 68px;
+}
+
+.hero p {
+  font-size: 18px;
+  line-height: 1.75;
+}
+
+.hero-preview,
+.feature-card,
+.panel,
+.metric,
+.company-card,
+.document-row,
+.overview-card {
+  box-shadow: none;
+}
+
+.hero-preview,
+.feature-card,
+.panel,
+.metric,
+.company-card,
+.document-row,
+.overview-card,
+.login-box {
+  background: rgba(10, 24, 21, 0.94);
+  border: 1px solid rgba(69, 224, 192, 0.12);
+}
+
+.brand-mark,
+.login-logo {
+  border-radius: 10px;
+}
+
+.sidebar-brand .brand-mark {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+}
+
+.login-page {
+  place-items: center;
+  padding: 90px 20px 40px;
+}
+
+.login-back {
+  top: 30px;
+  left: 38px;
+  font-size: 15px;
+}
+
+.login-box {
+  width: 460px;
+  padding: 34px;
+  border-radius: 14px;
+}
+
+.login-logo {
+  width: 54px;
+  height: 54px;
+  margin-bottom: 18px;
+  font-size: 22px;
+}
+
+.login-box .section-label {
+  margin-bottom: 10px;
+}
+
+.login-box h1 {
+  font-size: 42px;
+  margin: 0 0 12px;
+}
+
+.login-box > p {
+  font-size: 15px;
+  line-height: 1.65;
+  margin-bottom: 28px;
+  max-width: 360px;
+}
+
+.login-box label {
+  font-size: 11px;
+  margin: 16px 0 8px;
+}
+
+.login-box input {
+  padding: 14px 16px;
+  min-height: 52px;
+  font-size: 15px;
+  border-radius: 8px;
+}
+
+.identified-user {
+  gap: 12px;
+  margin: 18px 0 14px;
+  padding: 14px 16px;
+  border-radius: 8px;
+}
+
+.identified-user strong {
+  font-size: 13px;
+}
+
+.identified-user small {
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+.login-error {
+  font-size: 13px;
+  margin: 6px 0 10px;
+}
+
+.login-button {
+  width: 100%;
+  min-height: 54px;
+  margin-top: 8px;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.login-demo {
+  margin-top: 24px;
+  padding-top: 18px;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.login-demo strong {
+  font-size: 13px;
+}
+
+.sidebar {
+  width: 230px;
+  min-width: 230px;
+  padding: 24px 16px;
+}
+
+.sidebar-brand {
+  gap: 12px;
+  padding-bottom: 24px;
+}
+
+.sidebar-brand strong {
+  font-size: 14px;
+}
+
+.sidebar-brand small {
+  font-size: 11px;
+}
+
+.menu-label {
+  font-size: 11px;
+  margin: 22px 0 10px;
+}
+
+.side-menu {
+  gap: 6px;
+}
+
+.side-menu button,
+.side-logout {
+  padding: 12px 14px;
+  font-size: 14px;
+  border-radius: 8px;
+}
+
+.logged-user {
+  gap: 10px;
+  padding-top: 16px;
+}
+
+.user-dot {
+  width: 16px;
+  height: 16px;
+}
+
+.logged-user strong {
+  font-size: 12px;
+}
+
+.logged-user small {
+  font-size: 10px;
+}
+
+.system-topbar {
+  height: 76px;
+  padding: 0 36px;
+}
+
+.system-topbar > div:first-child span {
+  font-size: 11px;
+}
+
+.topbar-right {
+  gap: 16px;
+  font-size: 14px;
+}
+
+.role,
+.role-badge {
+  font-size: 11px;
+  padding: 7px 12px;
+}
+
+.page-content {
+  padding: 34px 36px 46px;
+}
+
+.page-title {
+  padding-bottom: 22px;
+  margin-bottom: 20px;
+}
+
+.page-title > div > span,
+.panel-company,
+.table-head,
+.user-table-head,
+.document-group > span,
+.form-panel label,
+.modal label {
+  font-size: 11px;
+}
+
+.page-title h1 {
+  font-size: 36px;
+}
+
+.overview-card {
+  min-height: 190px;
+  padding: 28px;
+  gap: 28px;
+  border-radius: 12px;
+}
+
+.gauge {
+  width: 108px;
+  height: 108px;
+}
+
+.gauge::after {
+  width: 80px;
+  height: 80px;
+}
+
+.gauge strong {
+  font-size: 22px;
+}
+
+.gauge span {
+  font-size: 8px;
+}
+
+.overview-text h2 {
+  margin-bottom: 10px;
+  font-size: 24px;
+}
+
+.overview-text p {
+  font-size: 14px;
+  line-height: 1.6;
+  max-width: 760px;
+}
+
+.mini-tags {
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.mini-tags span {
+  padding: 7px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+}
+
+.metric-grid {
+  gap: 16px;
+  margin: 16px 0 18px;
+}
+
+.metric {
+  min-height: 120px;
+  padding: 22px;
+  border-radius: 12px;
+}
+
+.metric strong {
+  font-size: 34px;
+}
+
+.metric span {
+  font-size: 13px;
+}
+
+.dashboard-grid {
+  gap: 16px;
+}
+
+.panel {
+  padding: 22px;
+  border-radius: 12px;
+}
+
+.panel h2 {
+  margin: 0 0 18px;
+  font-size: 18px;
+}
+
+.company-row {
+  min-height: 66px;
+}
+
+.company-row strong,
+.document-row strong,
+.company-card strong {
+  font-size: 14px;
+}
+
+.company-row small,
+.document-row small,
+.company-card small,
+.small-alert small,
+.alert-list-row small,
+.table-note,
+.panel-description,
+.form-help {
+  font-size: 11px;
+}
+
+.alert-box {
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.subheading {
+  font-size: 12px;
+  margin: 18px 0 10px;
+}
+
+.small-alert,
+.alert-list-row {
+  gap: 10px;
+  padding: 12px 0;
+}
+
+.small-alert strong,
+.alert-list-row strong {
+  font-size: 13px;
+}
+
+.status {
+  font-size: 11px;
+  padding: 6px 10px;
+  border-radius: 999px;
+}
+
+.form-panel input,
+.modal input,
+.modal select {
+  padding: 12px 14px;
+  font-size: 14px;
+  border-radius: 8px;
+}
+
+.form-row {
+  gap: 12px;
+}
+
+.company-card {
+  padding: 16px;
+  border-radius: 10px;
+}
+
+.document-row {
+  min-height: 64px;
+  padding: 12px 14px;
+  border-radius: 10px;
+}
+
+.table-row,
+.user-table-row {
+  min-height: 62px;
+  font-size: 13px;
+}
+
+.table-row strong small {
+  font-size: 10px;
+}
+
+.modal {
+  border-radius: 14px;
+}
+
+.modal-cabecalho h2 {
+  font-size: 24px;
+}
+
+@media (max-width: 1366px) {
+  .hero h1 {
+    font-size: 58px;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

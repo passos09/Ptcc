@@ -62,8 +62,6 @@ function TelaEntrada({ onLogin, onVoltar }) {
 
   return (
     <div className="login-page">
-      <div className="login-shape login-shape-one"></div>
-      <div className="login-shape login-shape-two"></div>
 
       <button className="login-back" onClick={onVoltar} disabled={carregando}>
         ← Voltar
