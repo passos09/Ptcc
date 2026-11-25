@@ -1,56 +1,209 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "../../../supabaseClient";
 
-function Usuarios({ usuarios, onAdicionar }) {
-  const [abrirFormulario, setAbrirFormulario] = useState(false);
-  const [formulario, setFormulario] = useState({ nome: "", email: "", cargo: "Gestor" });
+function Usuarios({ empresas = [], usuario }) {
+  const [usuarios, setUsuarios] = useState([]);
+  const [carregando, setCarregando] = useState(true);
+  const [salvando, setSalvando] = useState(null);
+  const [erro, setErro] = useState("");
+  const [sucesso, setSucesso] = useState("");
 
-  function salvar(evento) {
-    evento.preventDefault();
-    if (!formulario.nome || !formulario.email) return;
-    onAdicionar(formulario);
-    setFormulario({ nome: "", email: "", cargo: "Gestor" });
-    setAbrirFormulario(false);
+  useEffect(() => {
+    carregarUsuarios();
+  }, []);
+
+  async function carregarUsuarios() {
+    setCarregando(true);
+
+    const { data, error } = await supabase
+      .from("usuario")
+      .select("id, nome, email, perfil_id, empresa_id, ativo")
+      .order("nome");
+
+    if (error) {
+      setErro(error.message);
+    } else {
+      setUsuarios(data);
+    }
+
+    setCarregando(false);
+  }
+
+  async function atualizar(id, campos) {
+    if (salvando !== null) return;
+
+    setErro("");
+    setSucesso("");
+    setSalvando(id);
+
+    try {
+      const { data, error } = await supabase
+        .from("usuario")
+        .update(campos)
+        .eq("id", id)
+        .select("id, nome, email, perfil_id, empresa_id, ativo")
+        .single();
+
+      if (error) throw error;
+
+      setUsuarios((atuais) =>
+        atuais.map((u) => u.id === id ? data : u)
+      );
+
+      setSucesso("Usuário atualizado com sucesso.");
+    } catch (error) {
+      setErro(error.message);
+    } finally {
+      setSalvando(null);
+    }
+  }
+
+  if (usuario?.perfil_id !== 1) {
+    return <p>Acesso não autorizado.</p>;
   }
 
   return (
     <>
-      <div className="page-title page-title-button">
-        <div><span>ADMINISTRAÇÃO</span><h1>Usuários e permissões</h1></div>
-        <button className="button-primary small-button" onClick={() => setAbrirFormulario(true)}>+ Novo usuário</button>
+      <div className="page-title">
+        <div>
+          <span>ADMINISTRAÇÃO</span>
+          <h1>Gerenciamento de usuários</h1>
+        </div>
       </div>
 
-      <section className="panel table-panel">
-        <span className="panel-company">{usuarios.length} USUÁRIOS COM ACESSO AO SISTEMA</span>
-        <div className="user-table-head"><span>NOME</span><span>E-MAIL</span><span>PERFIL</span><span>STATUS</span></div>
-        {usuarios.map((usuario) => (
-          <div className="user-table-row" key={usuario.email}>
-            <strong>{usuario.nome}</strong>
-            <span>{usuario.email}</span>
-            <span className={`role-badge role-${usuario.cargo.toLowerCase()}`}>{usuario.cargo}</span>
-            <span className="status status-ativo">Ativo</span>
+      <div className="metric-grid">
+        <div className="metric">
+          <strong>{usuarios.length}</strong>
+          <span>Total de usuários</span>
+        </div>
+
+        <div className="metric">
+          <strong>
+            {usuarios.filter(u => u.perfil_id === 1).length}
+          </strong>
+          <span>Administradores</span>
+        </div>
+
+        <div className="metric">
+          <strong>
+            {usuarios.filter(u => u.perfil_id === 2).length}
+          </strong>
+          <span>Gestores</span>
+        </div>
+
+        <div className="metric">
+          <strong>
+            {usuarios.filter(u => u.ativo).length}
+          </strong>
+          <span>Usuários ativos</span>
+        </div>
+      </div>
+
+      {erro && (
+        <p style={{ color: "#ef4444" }}>{erro}</p>
+      )}
+
+      {sucesso && (
+        <p className="success-message">{sucesso}</p>
+      )}
+
+      <section className="panel">
+        <h2>Usuários cadastrados</h2>
+
+        {carregando && <p>Carregando usuários...</p>}
+
+        {usuarios.map((u) => (
+          <div
+            className="company-card"
+            key={u.id}
+            style={{ marginTop: 12 }}
+          >
+            <strong>{u.nome}</strong>
+
+            <p>{u.email}</p>
+
+            <p>
+              Perfil: {
+                u.perfil_id === 1
+                  ? "Administrador"
+                  : "Gestor"
+              }
+            </p>
+
+            <p style={{
+              color: u.ativo ? "#62d6a4" : "#ef4444"
+            }}>
+              {u.ativo ? "Ativo" : "Inativo"}
+            </p>
+
+            {u.perfil_id === 2 && (
+              <div>
+                <label>EMPRESA VINCULADA</label>
+
+                <select
+                  value={u.empresa_id ?? ""}
+                  disabled={salvando !== null}
+                  onChange={(e) =>
+                    atualizar(u.id, {
+                      empresa_id: e.target.value
+                        ? Number(e.target.value)
+                        : null
+                    })
+                  }
+                  style={{
+                    display: "block",
+                    margin: "10px 0",
+                    padding: 10,
+                    width: "100%",
+                    background: "#18352f",
+                    color: "#ffffff",
+                    borderRadius: 6
+                  }}
+                >
+                  <option value="">
+                    Sem empresa vinculada
+                  </option>
+
+                  {empresas.map((empresa) => (
+                    <option
+                      key={empresa.id}
+                      value={empresa.id}
+                    >
+                      {empresa.nome}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {u.perfil_id === 2 && u.id !== usuario.id && (
+              <button
+                className="button-primary small-button"
+                disabled={salvando !== null}
+                onClick={() => {
+                  if (window.confirm(
+                    u.ativo
+                      ? "Desativar este gestor?"
+                      : "Ativar este gestor?"
+                  )) {
+                    atualizar(u.id, { ativo: !u.ativo });
+                  }
+                }}
+              >
+                {salvando === u.id
+                  ? "Salvando..."
+                  : u.ativo
+                    ? "Desativar"
+                    : "Ativar"}
+              </button>
+            )}
+
+            {u.id === usuario.id && (
+              <small>Sua conta atual</small>
+            )}
           </div>
         ))}
       </section>
-
-      <p className="table-note">O administrador define o perfil de cada usuário e controla o acesso às áreas do sistema.</p>
-
-      {abrirFormulario && (
-        <div className="modal-fundo" onClick={() => setAbrirFormulario(false)}>
-          <section className="modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-cabecalho"><div><span>ADMINISTRAÇÃO</span><h2>Novo usuário</h2></div><button onClick={() => setAbrirFormulario(false)}>×</button></div>
-            <form onSubmit={salvar}>
-              <label>NOME</label>
-              <input value={formulario.nome} onChange={(e) => setFormulario({ ...formulario, nome: e.target.value })} placeholder="Nome do usuário" required />
-              <label>E-MAIL</label>
-              <input type="email" value={formulario.email} onChange={(e) => setFormulario({ ...formulario, email: e.target.value })} placeholder="usuario@docsystem.com.br" required />
-              <label>PERFIL</label>
-              <select value={formulario.cargo} onChange={(e) => setFormulario({ ...formulario, cargo: e.target.value })}><option>Gestor</option><option>Administrador</option></select>
-              <p className="form-help">A senha inicial para a demonstração será 123456.</p>
-              <div className="modal-acoes"><button type="button" className="button-secondary" onClick={() => setAbrirFormulario(false)}>Cancelar</button><button className="button-primary">Salvar usuário</button></div>
-            </form>
-          </section>
-        </div>
-      )}
     </>
   );
 }

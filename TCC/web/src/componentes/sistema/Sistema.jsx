@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Documentos from "./paginas/Documentos";
+import Usuarios from "./paginas/Usuarios";
 import Painel from "./paginas/Painel";
 import Historico from "./paginas/Historico";
 import Pendencias from "./paginas/Pendencias";
@@ -89,6 +90,14 @@ function Sistema({ usuario, onSair }) {
   }
 
   function renderizarPagina() {
+    if (tela === "usuarios" && administrador) {
+  return (
+    <Usuarios
+      empresas={empresas}
+      usuario={usuario}
+    />
+  );
+}
     if (tela === "historico") {
   return <Historico empresas={empresas} />;
 }
