@@ -10,7 +10,7 @@ function Destaque({ onEntrar }) {
         </h1>
 
         <p>
-          O 3DS - DOC-SYSTEM acompanha pendências fiscais e documentais
+          O  acompanha pendências fiscais e documentais
           para você agir antes que um problema vire prazo perdido.
         </p>
 
@@ -27,7 +27,7 @@ function Destaque({ onEntrar }) {
       <div className="hero-preview">
         <div className="preview-top">
           <div>
-            <span>3DS - DOC-SYSTEM</span>
+            <span>DOC-SYSTEM</span>
             <strong>Visão da carteira</strong>
           </div>
           <span className="preview-status">● Monitorando</span>

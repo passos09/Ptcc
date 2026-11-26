@@ -13,7 +13,7 @@ function PaginaInicial({ onEntrar }) {
       <Estatisticas />
       <section className="landing-cta">
         <div>
-          <span className="section-label">3DS - DOC-SYSTEM</span>
+          <span className="section-label">DOC-SYSTEM</span>
           <h2>Menos preocupação.<br />Mais controle.</h2>
           <p>
             Centralize o acompanhamento fiscal e documental das empresas

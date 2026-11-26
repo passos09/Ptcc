@@ -20,7 +20,7 @@ function BarraLateral({ tela, onMudarTela, onSair, administrador }) {
         className="brand-mark"
         />
         <div>
-          <strong>3DS - DOC-SYSTEM</strong>
+          <strong>DOC-SYSTEM</strong>
           <small>v1.0 • fiscal</small>
         </div>
       </div>

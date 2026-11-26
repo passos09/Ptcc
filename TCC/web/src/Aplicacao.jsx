@@ -105,6 +105,7 @@ function Aplicacao() {
       </div>
     );
   }
+  <form className="login-card" autoComplete="off"></form>
 
   if (tela === "inicio") {
     return (

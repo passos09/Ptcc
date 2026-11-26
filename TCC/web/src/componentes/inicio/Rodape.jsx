@@ -1,9 +1,9 @@
 function Rodape() {
   return (
     <footer id="contato">
-      <div className="brand"><span className="brand-mark">D</span><span>3DS - DOC-SYSTEM</span></div>
+      <div className="brand"><span className="brand-mark">D</span><span>DOC-SYSTEM</span></div>
       <span>Central de Monitoramento Fiscal e Documental</span>
-      <span>© 2026 3DS - DOC-SYSTEM</span>
+      <span>© 2026 DOC-SYSTEM </span>
     </footer>
   );
 }
